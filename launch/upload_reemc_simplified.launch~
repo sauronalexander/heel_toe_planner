@@ -1,0 +1,9 @@
+<launch>
+  <arg name="robot" default="full"/>
+
+  <!-- Robot description -->
+  <param name="robot_description" command="$(find xacro)/xacro.py '$(find heel_toe_planner)/reemc_description_simplified/robots/reemc_$(arg robot).urdf.xacro'"/>
+
+  <!-- Joint limits -->
+  <rosparam command="load" file="$(find heel_toe_planner)/reemc_description_simplified/sssconfig/joint_limits.yaml"/>
+</launch>
