@@ -29,7 +29,7 @@
 /* Function Definitions */
 void Forward_Kinematic(double theta_hip, double theta_knee, double theta_ankle,
   double lthigh, double lshank, double lfoot, double *x_cof, double *z_cof,
-  double *x_heel, double *z_heel)
+  double *x_heel, double *z_heel, double htar)
 {
   double x_ankle;
   double z_ankle;
@@ -39,10 +39,10 @@ void Forward_Kinematic(double theta_hip, double theta_knee, double theta_ankle,
   /* Output(in HIP's frame): x_toe, z_toe, x_heel, z_heel, x_cof, z_cof */
   x_ankle = lthigh * sin(theta_hip) + lshank * sin(theta_hip + theta_knee);
   z_ankle = -lthigh * cos(theta_hip) - lshank * cos(theta_hip + theta_knee);
-  *x_heel = x_ankle - 0.2 * lfoot * cos((theta_hip + theta_knee) - theta_ankle);
-  *z_heel = z_ankle - 0.2 * lfoot * sin((theta_hip + theta_knee) - theta_ankle);
-  *x_cof = x_ankle + 0.3 * lfoot * cos((theta_hip + theta_knee) - theta_ankle);
-  *z_cof = z_ankle + 0.3 * lfoot * sin((theta_hip + theta_knee) - theta_ankle);
+  *x_heel = x_ankle - htar * lfoot * cos((theta_hip + theta_knee) - theta_ankle);
+  *z_heel = z_ankle - htar * lfoot * sin((theta_hip + theta_knee) - theta_ankle);
+  *x_cof = x_ankle + (0.5-htar) * lfoot * cos((theta_hip + theta_knee) - theta_ankle);
+  *z_cof = z_ankle + (0.5-htar) * lfoot * sin((theta_hip + theta_knee) - theta_ankle);
 }
 
 /* End of code generation (Forward_Kinematic.c) */

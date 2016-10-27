@@ -63,7 +63,7 @@ void COM_Boundary_Condition(double lthigh, double lshank, double lfoot, double
 
   Forward_Kinematic(theta_iss[0], theta_iss[1], theta_iss[2], lthigh,
                     lshank, lfoot, &x_init_x, &x_init_z, &x_init_heel,
-                    &z_init_heel);
+                    &z_init_heel, htar);
   x_init_pframe[0] = x_init_x;
   x_init_pframe[1] = x_init_z;
   x_init_heel_pframe[0] = x_init_heel;
@@ -79,7 +79,7 @@ void COM_Boundary_Condition(double lthigh, double lshank, double lfoot, double
 
   Forward_Kinematic(theta_ess[0], theta_ess[1], theta_ess[2], lthigh,
                     lshank, lfoot, &x_init_x, &x_init_z, &x_init_heel,
-                    &z_init_heel);
+                    &z_init_heel, htar);
   x_end_pframe[0] = x_init_x;
   x_end_pframe[1] = x_init_z;
   x_end_heel_pframe[0] = x_init_heel;

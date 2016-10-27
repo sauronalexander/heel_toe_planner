@@ -21,6 +21,6 @@
 #include "heel_toe_planner/COM_Generation/Heel_Toe_Planner_Part1_types.h"
 
 /* Function Declarations */
-extern void Forward_Kinematic(double theta_hip, double theta_knee, double theta_ankle, double lthigh, double lshank, double lfoot, double *x_cof, double *z_cof, double *x_heel, double *z_heel);
+extern void Forward_Kinematic(double theta_hip, double theta_knee, double theta_ankle, double lthigh, double lshank, double lfoot, double *x_cof, double *z_cof, double *x_heel, double *z_heel, double htar);
 #endif
 /* End of code generation (Forward_Kinematic.h) */
