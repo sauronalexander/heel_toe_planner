@@ -116,7 +116,7 @@ void COM_Generation::Generate_COM()
     ze = 0.5*lfoot*sin(theta_e[0]+theta_e[1]-theta_e[2]);
     zi = -0.5*lfoot*sin(theta_i[0]+theta_i[1]);
 
-    ROS_INFO_STREAM("ze: "<<ze<<"; zi"<<zi);
+    ROS_INFO_STREAM("ze: "<<ze<<"; zi: "<<zi);
 
     b_COM_Generation(totaltime, tinit, tend, tstep, ratio, Period, lstep, lfoot, w, wfoot, htar, Mtot,
                    m1, m2, m3, g, zmp_x, zmp_y, delta_y, coef_x, coef_y, x_init_pframe, x_init_heel_pframe,

@@ -64,9 +64,10 @@ bool NLP2::get_starting_point(Ipopt::Index n, bool init_x, Ipopt::Number *x, boo
     assert(init_x == true);
     assert(init_z == false);
     assert(init_lambda == false);
-    x[0] = -1.0*M_PI/2;
-    x[1] = -1.0*M_PI/2;
-    x[2] = M_PI/2;
+    //First Solved In Matlab
+    x[0] = -0.2833;
+    x[1] = -0.6665;
+    x[2] = 0.3929;
     return true;
 }
 
@@ -91,7 +92,8 @@ bool NLP2::eval_g(Ipopt::Index n, const Ipopt::Number *x, bool new_x, Ipopt::Ind
             -(lstep-lfoot+htar*lfoot);
     g[1] = lthigh*cos(x[0]) + lshank*cos(x[0]+x[1]) - (1-htar)*lfoot*sin(x[0]+x[1]) - z2;
     g[2] = (lthigh+lshank)*cos(x[2])-z2;
-    //std::cout<<"eval_g: "<<g[0]<<", "<<g[1]<<", "<<g[2]<<std::endl;
+//    std::cout<<"eval_g: "<<g[0]<<", "<<g[1]<<", "<<g[2]<<std::endl;
+//    std::cout<<x[0]<<", "<<x[1]<<", "<<x[2]<<std::endl;
     return true;
 }
 

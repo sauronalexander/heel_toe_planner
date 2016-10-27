@@ -70,10 +70,10 @@ bool NLP3::get_starting_point(Ipopt::Index n, bool init_x, Ipopt::Number *x, boo
     assert(init_x == true);
     assert(init_z == false);
     assert(init_lambda == false);
-    x[0] = 0.0;
-    x[1] = -1.0*M_PI/2;
-    x[2] = -1.0*M_PI/2;
-    x[3] = -1.0*M_PI/2;
+    x[0] = 0.9497;
+    x[1] = -0.6665;
+    x[2] = -0.6665;
+    x[3] = -0.3929;
     return true;
 }
 
