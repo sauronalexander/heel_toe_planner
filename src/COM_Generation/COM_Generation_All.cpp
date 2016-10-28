@@ -35,6 +35,8 @@ COM_Generation::COM_Generation()
     y_trunk = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
     z_left = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
     z_right = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
+    theta_left = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
+    theta_right = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
 
     Initial_emxArry(leftgait_x);
     Initial_emxArry(rightgait_x);
@@ -60,26 +62,33 @@ COM_Generation::COM_Generation()
     Initial_emxArry(y_trunk);
     Initial_emxArry(z_left);
     Initial_emxArry(z_right);
+    Initial_emxArry(theta_left);
+    Initial_emxArry(theta_right);
 }
 
-void COM_Generation::Set_Parameters(double totaltime, double tinit, double tend, double tstep, double ratio,
-                                    double w, double wfoot, double Period, double htar, double lfoot,
-                                    double lstep, double lthigh, double lshank, double z2)
+void COM_Generation::Set_Parameters(double totaltime, double tinit, double tend, double tstep,
+                                    double ratio, double Period, double lstep, double z2)
 {
     this->totaltime = totaltime;
     this->tinit = tinit;
     this->tend = tend;
     this->tstep = tstep;
     this->ratio = ratio;
-    this->w = w;
-    this->wfoot = wfoot;
     this->Period = Period;
-    this->htar = htar;
-    this->lfoot = lfoot;
     this->lstep = lstep;
+    this->z2 = z2;
+}
+
+void COM_Generation::Set_Robot_Parameters(double lthigh, double lshank, double htar,
+                                          double lfoot, double w, double wfoot)
+{
     this->lthigh = lthigh;
     this->lshank = lshank;
-    this->z2 = z2;
+    this->w = w;
+    this->wfoot = wfoot;
+    this->htar = htar;
+    this->lfoot = lfoot;
+
 }
 
 void COM_Generation::Set_Mass(double Mtot, double m1, double m2, double m3, double g)
@@ -115,6 +124,9 @@ void COM_Generation::Generate_COM()
     zi_p = z2 + x_init_pframe[1];
     ze = 0.5*lfoot*sin(theta_e[0]+theta_e[1]-theta_e[2]);
     zi = -0.5*lfoot*sin(theta_i[0]+theta_i[1]);
+    theta_start = -1.0*(theta_e[0]+theta_e[1]-theta_e[2]);
+    theta_end = -1.0*(theta_i[0]+theta_i[1]);
+
 
     ROS_INFO_STREAM("ze: "<<ze<<"; zi: "<<zi);
 
@@ -122,7 +134,7 @@ void COM_Generation::Generate_COM()
                    m1, m2, m3, g, zmp_x, zmp_y, delta_y, coef_x, coef_y, x_init_pframe, x_init_heel_pframe,
                    x_end_pframe, x_end_heel_pframe, theta_i, theta_e, zmpUB_x_t, zmpLB_x_t,
                    zmpUB_x, zmpLB_x, zmpUB_y, zmpLB_y, leftgait_x, rightgait_x, leftgait_y, rightgait_y,
-                   z2, ze, zi, x_left, x_right, x_trunk, y_trunk, z_left, z_right);
+                   z2, ze, zi, x_left, x_right, x_trunk, y_trunk, z_left, z_right, theta_left, theta_right);
 }
 
 void COM_Generation::Error()
@@ -164,6 +176,8 @@ COM_Generation::~COM_Generation()
     Delete_emxArry(y_trunk);
     Delete_emxArry(z_left);
     Delete_emxArry(z_right);
+    Delete_emxArry(theta_left);
+    Delete_emxArry(theta_right);
 
     leftgait_x = NULL;
     rightgait_x = NULL;
@@ -196,4 +210,6 @@ COM_Generation::~COM_Generation()
     y_trunk = NULL;
     z_left = NULL;
     z_right = NULL;
+    theta_left = NULL;
+    theta_right = NULL;
 }

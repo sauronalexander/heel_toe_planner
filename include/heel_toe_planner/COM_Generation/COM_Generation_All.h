@@ -52,25 +52,18 @@ class COM_Generation
         emxArray_real_T * delta_y;
         emxArray_real_T * coef_x;
         emxArray_real_T * coef_y;
-        double * theta_i;
-        double * theta_e;
+
         double * x_init_pframe;
         double * x_init_heel_pframe;
         double * x_end_pframe;
         double * x_end_heel_pframe;
-        emxArray_real_T * x_left;
-        emxArray_real_T * x_right;
-        emxArray_real_T * x_trunk;
-        emxArray_real_T * y_trunk;
-        emxArray_real_T * z_left;
-        emxArray_real_T * z_right;
 
         double totaltime;
         double tinit;
         double tend;
         double tstep;
         double ratio;
-        double w;
+
         double wfoot;
         double Period;
         double htar;
@@ -78,9 +71,7 @@ class COM_Generation
         double lfoot;
         double lthigh;
         double lshank;
-        double z2;
-        double zi;
-        double ze;
+
 
         //Mass
         double Mtot;
@@ -93,16 +84,35 @@ class COM_Generation
         double zi_p;
         double ze_p;
 
+    protected:
+        emxArray_real_T * x_left;
+        emxArray_real_T * x_right;
+        emxArray_real_T * x_trunk;
+        emxArray_real_T * y_trunk;
+        emxArray_real_T * z_left;
+        emxArray_real_T * z_right;
+        emxArray_real_T * theta_left;
+        emxArray_real_T * theta_right;
+        double z2;
+        double zi;
+        double ze;
+        double theta_start;
+        double theta_end;
+        double * theta_i;
+        double * theta_e;
+        double w;
+
 	public:
 
 		COM_Generation();
-        void Set_Parameters(double totaltime, double tinit, double tend, double tstep, double ratio,
-                             double w, double wfoot, double Period, double htar, double lfoot, double lstep,
-                             double lthigh, double lshank, double z2);
-        void Set_Mass(double Mtot, double m1, double m2, double m3, double g);
-		void Generate_COM();
-        void Error();
-        ~COM_Generation();
+        void Set_Parameters(double totaltime, double tinit, double tend, double tstep,
+                            double ratio, double Period, double lstep, double z2);
+        void Set_Robot_Parameters(double lthigh, double lshank, double htar, double lfoot,
+                                  double w, double wfoot);
+        virtual void Set_Mass(double Mtot, double m1, double m2, double m3, double g);
+        void Generate_COM();
+        virtual void Error();
+        virtual ~COM_Generation();
 };
 
 #endif // COM_GENERATION_ALL_H

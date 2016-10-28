@@ -40,7 +40,7 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
                     double z2, double ze, double zi, emxArray_real_T *x_left,
                     emxArray_real_T *x_right, emxArray_real_T *x_trunk,
                     emxArray_real_T *y_trunk, emxArray_real_T *z_left,
-                    emxArray_real_T *z_right)
+                    emxArray_real_T *z_right, emxArray_real_T *theta_left, emxArray_real_T *theta_right)
 {
   double x;
   double Sample_step;
@@ -79,6 +79,8 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
   emxArray_real_T *x3;
   emxArray_real_T *z1;
   emxArray_real_T *z3;
+  emxArray_real_T *theta1;
+  emxArray_real_T *theta3;
   double y3;
   double i;
   int jdelta_y;
@@ -167,6 +169,9 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
     }
   }
 
+  double theta_start = (theta_iss[0]+theta_iss[1]);
+  double theta_end = (theta_ess[0]+theta_ess[1]-theta_ess[2]);
+
   /* initiallization */
   i0 = x_left->size[0] * x_left->size[1];
   x_left->size[0] = 1;
@@ -222,6 +227,24 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
     z_right->data[i0] = 0.0;
   }
 
+  i0 = theta_left->size[0] * theta_left->size[1];
+  theta_left->size[0] = 1;
+  theta_left->size[1] = (int)Nsample;
+  emxEnsureCapacity((emxArray__common *)theta_left, i0, (int)sizeof(double));
+  nm1d2 = (int)Nsample;
+  for (i0 = 0; i0 < nm1d2; i0++) {
+    theta_left->data[i0] = 0.0;
+  }
+
+  i0 = theta_right->size[0] * theta_right->size[1];
+  theta_right->size[0] = 1;
+  theta_right->size[1] = (int)Nsample;
+  emxEnsureCapacity((emxArray__common *)theta_right, i0, (int)sizeof(double));
+  nm1d2 = (int)Nsample;
+  for (i0 = 0; i0 < nm1d2; i0++) {
+    theta_right->data[i0] = 0.0;
+  }
+
   /* Sample_init */
   /* X_Component */
   cdiff = zmpLB_x_t->data[0] + 0.5 * lfoot;
@@ -260,6 +283,8 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
       Constant_prime_Y;
     z_left->data[nm1d2] = zi;
     z_right->data[nm1d2] = 0.0;
+    theta_left->data[nm1d2] = theta_start + t->data[nm1d2]*(theta_end-theta_start) / tinit;
+    theta_right->data[nm1d2] = 0.0;
 
     /* y_left(i) = C1_Y*exp(-sqrt(g/ze)*t(i)) +  C2_Y*exp(sqrt(g/ze)*t(i)) + ... */
     /*     alpha*t(i)^4 + beta*t(i)^3 + gamma*t(i)^2 + fai*t(i) + ita + Constant_prime_Y; */
@@ -271,6 +296,8 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
   emxInit_real_T(&x3, 2);
   emxInit_real_T(&z1, 2);
   emxInit_real_T(&z3, 2);
+  emxInit_real_T(&theta1, 2);
+  emxInit_real_T(&theta3, 2);
 
   /* Double Support of Sample_init */
   /* Left foot in front */
@@ -280,7 +307,7 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
     + 1.0) - 1], rightgait_x->data[(int)(Sample_init_SS + 1.0) - 1] + lfoot,
     leftgait_x->data[(int)(Sample_init_SS + 1.0) - 1] - x_end_heel_pframe[0],
     rightgait_x->data[(int)(Sample_init_SS + 1.0) - 1] - x_init_heel_pframe[0],
-    x1, x2, x3, z1, z3);
+    x1, x2, x3, z1, z3, theta1, theta3);
   cdiff = w / 4.0;
   y3 = -w / 4.0;
   b_Y_DS_Differential_Equa_Solver(Sample_init_SS, Sample_init, t, g, z2, lfoot,
@@ -295,6 +322,8 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
     y_trunk->data[(int)i - 1] = y2->data[(int)(i - Sample_init_SS) - 1];
     z_left->data[(int)i - 1] = z1->data[(int)(i - Sample_init_SS) - 1];
     z_right->data[(int)i - 1] = z3->data[(int)(i - Sample_init_SS) - 1];
+    theta_left->data[(int)i - 1] = theta1->data[(int)(i - Sample_init_SS) - 1];
+    theta_right->data[(int)i - 1] = theta3->data[(int)(i - Sample_init_SS) - 1];
   }
   /* Normal Steps */
   Sample_init_SS = 2.0;
@@ -359,6 +388,9 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
         i - 1] - t->data[(int)(offset + 1.0) - 1])) + ita) + Constant_prime_Y;
       z_left->data[(int)i - 1] = 0.0;
       z_right->data[(int)i - 1] = zi;
+      theta_left->data[(int)i - 1] = 0.0;
+      theta_right->data[(int)i - 1] = theta_start + (t->data[(int)i-1] - t->data[(int)(offset + 1.0)-1])
+                                * (theta_end - theta_start)/tss;
     }
 
     /* Double Support of Sample_init */
@@ -369,7 +401,7 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
       coef_x->data[jx + 4], coef_x->data[jx + 5], coef_x->data[jx + 6], t->data
       [(int)((offset + Sample_ss) + 1.0) - 1], rightgait_x->data[(int)((offset +
       Sample_ss) + 1.0) - 1], leftgait_x->data[(int)((offset + Sample_ss) + 1.0)
-      - 1] + lfoot, ndbl, cdiff, x1, x2, x3, z1, z3);
+      - 1] + lfoot, ndbl, cdiff, x1, x2, x3, z1, z3, theta1, theta3);
     b_Y_DS_Differential_Equa_Solver(offset + Sample_ss, offset + Sample_step, t, g,
       z2, lfoot, tds, theta_ess, theta_iss, m1, m2, m3, -w / 2.0, w / 2.0,
       coef_y->data[jy + 2], coef_y->data[jy + 3], coef_y->data[jy + 4], t->data
@@ -384,6 +416,8 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
       y_trunk->data[(int)i - 1] = y2->data[(int)((i - offset) - Sample_ss) - 1];
       z_left->data[(int)i - 1] = z3->data[(int)((i - offset) - Sample_ss) - 1];
       z_right->data[(int)i - 1] = z1->data[(int)((i - offset) - Sample_ss) - 1];
+      theta_left->data[(int)i - 1] = theta3->data[(int)((i - offset) - Sample_ss) - 1];
+      theta_right->data[(int)i - 1] = theta1->data[(int)((i - offset) - Sample_ss) - 1];
     }
 
     jx += 8;
@@ -437,6 +471,9 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
         i - 1] - t->data[(int)(offset + 1.0) - 1])) + ita) + Constant_prime_Y;
       z_left->data[(int)i - 1] = zi;
       z_right->data[(int)i - 1] = 0.0;
+      theta_left->data[(int)i - 1] = theta_start + (t->data[(int)i-1] - t->data[(int)(offset + 1.0)-1])
+                                 * (theta_end - theta_start)/tss;
+      theta_right->data[(int)i - 1] = 0.0;
     }
 
     /* Double Support of Sample_init */
@@ -447,7 +484,7 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
       3], coef_x->data[jx + 4], coef_x->data[jx + 5], coef_x->data[jx + 6], t->
       data[(int)((offset + Sample_ss) + 1.0) - 1], leftgait_x->data[(int)((offset
       + Sample_ss) + 1.0) - 1], rightgait_x->data[(int)((offset + Sample_ss) +
-      1.0) - 1] + lfoot, ndbl, cdiff, x1, x2, x3, z1, z3);
+      1.0) - 1] + lfoot, ndbl, cdiff, x1, x2, x3, z1, z3, theta1, theta3);
     cdiff = -w / 2.0;
     y3 = w / 2.0;
     b_Y_DS_Differential_Equa_Solver(offset + Sample_ss, offset + Sample_step, t, g,
@@ -464,6 +501,8 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
       y_trunk->data[(int)i - 1] = y2->data[(int)((i - offset) - Sample_ss) - 1];
       z_left->data[(int)i - 1] = z1->data[(int)((i - offset) - Sample_ss) - 1];
       z_right->data[(int)i - 1] = z3->data[(int)((i - offset) - Sample_ss) - 1];
+      theta_left->data[(int)i - 1] = theta1->data[(int)((i - offset) - Sample_ss) - 1];
+      theta_right->data[(int)i - 1] = theta3->data[(int)((i - offset) - Sample_ss) - 1];
     }
 
     jx += 8;
@@ -524,6 +563,15 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
       - 1] - t->data[(int)(offset + 1.0) - 1])) + ita) + Constant_prime_Y;
     z_left->data[(int)i - 1] = 0.0;
     z_right->data[(int)i - 1] = zi;
+    theta_left->data[(int)i - 1] = 0.0;
+    theta_right->data[(int)i - 1] = theta_start + (t->data[(int)i-1] - t->data[(int)(offset + 1.0)-1])
+            * (theta_end - theta_start)/(tend-tds);
+  }
+
+  for(int i=0; i<theta_left->size[1]; i++)
+  {
+      theta_left->data[i] = -1.0*theta_left->data[i];
+      theta_right->data[i] = -1.0*theta_right->data[i];
   }
 
   emxFree_real_T(&t);

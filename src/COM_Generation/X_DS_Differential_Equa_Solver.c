@@ -24,7 +24,8 @@ void X_DS_Differential_Equa_Solver(double Start, double End, emxArray_real_T *
   tds, const double theta_ess[4], const double theta_iss[3], double m1, double
   m2, double m3, double ze, double A2, double w2, double fai2, double O2, double
   t0, double x1_0, double x3_0, double x2_init, double x2_end, emxArray_real_T
-  *x1, emxArray_real_T *x2, emxArray_real_T *x3, emxArray_real_T *z1, emxArray_real_T *z3)
+  *x1, emxArray_real_T *x2, emxArray_real_T *x3, emxArray_real_T *z1, emxArray_real_T *z3,
+  emxArray_real_T *theta_1, emxArray_real_T *theta_3)
 {
   double x[4];
   double b_t0[16];
@@ -207,6 +208,24 @@ void X_DS_Differential_Equa_Solver(double Start, double End, emxArray_real_T *
     z3->data[i6] = 0.0;
   }
 
+  i6 = theta_1->size[0] * theta_1->size[1];
+  theta_1->size[0] = 1;
+  theta_1->size[1] = (int)((End - Start) + 1.0);
+  emxEnsureCapacity((emxArray__common *)theta_1, i6, (int)sizeof(double));
+  loop_ub = (int)((End - Start) + 1.0);
+  for (i6 = 0; i6 < loop_ub; i6++) {
+    theta_1->data[i6] = 0.0;
+  }
+
+  i6 = theta_3->size[0] * theta_3->size[1];
+  theta_3->size[0] = 1;
+  theta_3->size[1] = (int)((End - Start) + 1.0);
+  emxEnsureCapacity((emxArray__common *)theta_3, i6, (int)sizeof(double));
+  loop_ub = (int)((End - Start) + 1.0);
+  for (i6 = 0; i6 < loop_ub; i6++) {
+    theta_3->data[i6] = 0.0;
+  }
+
   i6 = (int)((End + 1.0) + (1.0 - (Start + 1.0)));
   for (loop_ub = 0; loop_ub < i6; loop_ub++) {
     i = (Start + 1.0) + (double)loop_ub;
@@ -230,7 +249,10 @@ void X_DS_Differential_Equa_Solver(double Start, double End, emxArray_real_T *
             [(int)i - 1] + x[1]);
     z3->data[(int)(i - Start) - 1] = - 0.5 * lfoot * sin(x[2] * t->data
             [(int)i - 1] + x[3]);
+    theta_1->data[(int)(i - Start) - 1] = x[0] * t->data[(int)i - 1] + x[1];
+    theta_3->data[(int)(i - Start) - 1] = x[2] * t->data[(int)i - 1] + x[3];
   }
+
 }
 
 void b_X_DS_Differential_Equa_Solver(double Start, double End, const

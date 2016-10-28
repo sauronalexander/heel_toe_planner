@@ -79,6 +79,8 @@ add_library(${PROJECT_NAME}	src/COM_Generation/COM_Boundary_Condition.c
 				src/COM_Generation/Ipopt_Solver/Nonlinear_Eqn_Solver2.cpp
 				src/COM_Generation/Ipopt_Solver/Nonlinear_Eqn_Solver3.cpp
 				src/COM_Generation/Ipopt_Solver/NLP_Interface.cpp
+				src/IK_Solver.cpp
+				src/Three_Mass.cpp
 
 )
 

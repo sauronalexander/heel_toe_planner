@@ -196,18 +196,22 @@ int main(int argc, char ** argv)
     emxArray_real_T * y_trunk = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
     emxArray_real_T * z_left = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
     emxArray_real_T * z_right = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
+    emxArray_real_T * theta_left = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
+    emxArray_real_T * theta_right = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
     Initial_emxArry(x_left);
     Initial_emxArry(x_right);
     Initial_emxArry(x_trunk);
     Initial_emxArry(y_trunk);
     Initial_emxArry(z_left);
     Initial_emxArry(z_right);
+    Initial_emxArry(theta_left);
+    Initial_emxArry(theta_right);
 
     b_COM_Generation(totaltime, tinit, tend, tstep, ratio, Period, lstep, lfoot, w, wfoot, htar, Mtot,
                    m1, m2, m3, g, zmp_x, zmp_y, delta_y, coef_x, coef_y, x_init_pframe, x_init_heel_pframe,
                    x_end_pframe, x_end_heel_pframe, theta_i, theta_e, zmpUB_x_t, zmpLB_x_t,
                    zmpUB_x, zmpLB_x, zmpUB_y, zmpLB_y, leftgait_x, rightgait_x, leftgait_y, rightgait_y,
-                   z2, ze, zi, x_left, x_right, x_trunk, y_trunk, z_left, z_right);
+                   z2, ze, zi, x_left, x_right, x_trunk, y_trunk, z_left, z_right, theta_left, theta_right);
 
 //    std::cout<<"x_left: "<<(x_left->size[1])<<std::endl;
 //    temp = x_left->data;
@@ -285,6 +289,8 @@ int main(int argc, char ** argv)
     Delete_emxArry(y_trunk);
     Delete_emxArry(z_left);
     Delete_emxArry(z_right);
+    Delete_emxArry(theta_left);
+    Delete_emxArry(theta_right);
 
     leftgait_x = NULL;
     rightgait_x = NULL;
@@ -317,6 +323,7 @@ int main(int argc, char ** argv)
     y_trunk = NULL;
     z_left = NULL;
     z_right = NULL;
-
+    theta_left = NULL;
+    theta_right = NULL;
     return 0;
 }

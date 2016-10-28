@@ -44,7 +44,7 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
                     double z2, double ze, double zi, emxArray_real_T *x_left,
                     emxArray_real_T *x_right, emxArray_real_T *x_trunk,
                     emxArray_real_T *y_trunk, emxArray_real_T *z_left,
-                    emxArray_real_T *z_right);
+                    emxArray_real_T *z_right, emxArray_real_T *theta_left, emxArray_real_T *theta_right);
 
 #ifdef __cplusplus
 }
