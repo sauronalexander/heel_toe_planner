@@ -19,6 +19,7 @@
 #include <pal_multicontact_planner/element.h>
 #include <trac_ik/trac_ik.hpp>
 #include <kdl/chainiksolverpos_nr_jl.hpp>
+#include <pcl/point_cloud.h>
 
 class IK_Solver
 {

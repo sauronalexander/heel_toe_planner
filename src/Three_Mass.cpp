@@ -17,7 +17,6 @@ Three_Mass::Three_Mass(ros::NodeHandle & nh) : IK_Solver(nh), COM_Generation()
     }
     jointPub.publish(jointStateMsg);
 
-    this->trunk_offset = trunk_offset;
     base.Set(0, trunk_offset, 0, 1, 0, 0, 0);
 
     Eigen::VectorXd joint_value(jointNames.size());
@@ -40,7 +39,9 @@ Three_Mass::Three_Mass(ros::NodeHandle & nh) : IK_Solver(nh), COM_Generation()
     double lshank = position_set[4][2] - position_set[5][2];
     lthigh = 0.2977;
     lshank = 0.2977;
-    this->trunk_offset = position_set[0][2];
+    this->trunk_offset = -1.0*position_set[0][2];
+
+    std::cout<<"trunk offset: "<<trunk_offset<<std::endl;
     double w = 0.3;//2*position_set[0][1];
     double lfoot = 0.22368;
     double wfoot = 0.14651;
@@ -112,9 +113,9 @@ void Three_Mass::Visualize()
             baseTf.setIdentity();
             baseTf(0, 3) = x_trunk->data[i];
             baseTf(1, 3) = y_trunk->data[i];
-            baseTf(2, 3) = z2+this->trunk_offset;
+            baseTf(2, 3) = this->trunk_offset;
             tf::Transform base_tf;
-            pal::convert(baseTf.inverse(), base_tf);
+            pal::convert(baseTf, base_tf);
             br.sendTransform(tf::StampedTransform(base_tf, ros::Time::now(), "/world", "/base_link"));
             jointStateMsg.header.stamp = ros::Time::now();
             jointStateMsg.name = jointNames;
@@ -123,6 +124,7 @@ void Three_Mass::Visualize()
                 jointStateMsg.position[i] = Q[i];
             jointPub.publish(jointStateMsg);
         }
+        ros::Duration(0.1).sleep();
 
     }
 
