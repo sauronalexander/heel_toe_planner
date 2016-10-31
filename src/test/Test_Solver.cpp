@@ -40,12 +40,12 @@ int main(int argv, char** argc)
     w3 = NLP1_Solver(0.076745, 0.1, -0.35493395, -0.07674570);
     std::cout<<w3<<std::endl;
     double * theta_i = (double*) malloc(3*sizeof(double));
-    NLP2_Solver(0.2977, 0.2977, 0.2237, 0.6, 0.55, 0.5, theta_i);
+    NLP2_Solver(0.2996, 0.2996, 0.2237, 0.6, 0.55, 0.5, theta_i);
     for(int i=0; i<3; i++)
         std::cout<<theta_i[i]<<", ";
     std::cout<<std::endl;
     double * theta_e = (double*) malloc(4*sizeof(double));
-    NLP3_Solver(0.2977, 0.2977, 0.2237, 0.6, 0.55, 0.5, 0.0910, theta_e);
+    NLP3_Solver(0.2996, 0.2996, 0.2237, 0.6, 0.55, 0.5, 0.0932, theta_e);
     for(int i=0; i<4; i++)
         std::cout<<theta_e[i]<<", ";
     std::cout<<std::endl;

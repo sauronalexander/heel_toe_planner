@@ -66,7 +66,7 @@ void COM_Boundary_Condition(double lthigh, double lshank, double lfoot, double
                     &z_init_heel, htar);
   x_init_pframe[0] = x_init_x;
   x_init_pframe[1] = x_init_z;
-  x_init_heel_pframe[0] = x_init_heel;
+  x_init_heel_pframe[0] = (lthigh + lshank) * sin(theta_iss[2]) - htar*lfoot;
   x_init_heel_pframe[1] = z_init_heel;
   double zi = -0.5*lfoot*sin(theta_iss[0]+theta_iss[1]);
   /* { */
@@ -82,7 +82,7 @@ void COM_Boundary_Condition(double lthigh, double lshank, double lfoot, double
                     &z_init_heel, htar);
   x_end_pframe[0] = x_init_x;
   x_end_pframe[1] = x_init_z;
-  x_end_heel_pframe[0] = x_init_heel;
+  x_end_heel_pframe[0] = (lshank+lthigh) * sin(theta_ess[3]) - 0.5*lfoot;
   x_end_heel_pframe[1] = z_init_heel;
 }
 

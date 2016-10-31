@@ -82,7 +82,7 @@ void Gait_Generation(double totaltime, double tinit, double tend, double tstep,
   Sample_init_SS = floor(10.0 * tinit / (10.0 * Period));
   Nsample = (((x + 2.0) - 2.0) * Sample_step + Sample_init_SS) + (floor(tend /
     Period) + 1.0);
-printf("%f\n", Nsample);
+
   /* Number of samples  */
   tss = (1.0 - ratio) * tstep;
   Sample_init = Sample_init_SS + floor(ratio * tstep / Period);

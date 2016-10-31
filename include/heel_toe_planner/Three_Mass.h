@@ -31,6 +31,7 @@ class Three_Mass : public IK_Solver, public COM_Generation
         tf::TransformBroadcaster br;
         sensor_msgs::JointState jointStateMsg;
         std::vector<double> Q;
+        std::vector<int> error_vector;
 
     public:
         Three_Mass(ros::NodeHandle & nh);

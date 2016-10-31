@@ -39,11 +39,11 @@ bool NLP2_Solver(double lthigh, double lshank, double lfoot, double lstep, doubl
     for(int i=0; i<3; i++)
     {
         app = IpoptApplicationFactory();
-        app->Options()->SetNumericValue("tol", 2e-3);
+        app->Options()->SetNumericValue("tol", 1e-2);
         app->Options()->SetStringValue("mu_strategy", "adaptive");
         app->Options()->SetIntegerValue("print_level", 0);
-        app->Options()->SetNumericValue("constr_viol_tol", 2e-3);
-        app->Options()->SetNumericValue("acceptable_tol", 2e-3);
+        app->Options()->SetNumericValue("constr_viol_tol", 1e-2);
+        app->Options()->SetNumericValue("acceptable_tol", 1e-2);
         Ipopt::ApplicationReturnStatus status;
         status = app->Initialize();
         if(status != Ipopt::Solve_Succeeded)

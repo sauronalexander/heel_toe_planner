@@ -105,7 +105,7 @@ bool IK_Solver::Solve(int limb, element &query, std::vector<double> &Q, bool out
     }
 
 
-    std::cout<<query.Get_Pos().x<<"; "<<query.Get_Pos().y<<"; "<<query.Get_Pos().z<<std::endl;
+    //std::cout<<query.Get_Pos().x<<"; "<<query.Get_Pos().y<<"; "<<query.Get_Pos().z<<std::endl;
 
     InteractiveMakerReference baseReference(nh, "base", "world", base_position, base_orientation);
     Eigen::Vector3d target_pos;
@@ -150,7 +150,7 @@ bool IK_Solver::Solve(int limb, element &query, std::vector<double> &Q, bool out
         }
     }
 
-    std::cout<<"target_pose: "<<end_effector_pose.p(0)<<", "<<end_effector_pose.p(1)<<", "<<end_effector_pose.p(2)<<std::endl;
+    //std::cout<<"target_pose: "<<end_effector_pose.p(0)<<", "<<end_effector_pose.p(1)<<", "<<end_effector_pose.p(2)<<std::endl;
 
     KDL::JntArray result;
     int rc = tracik_solver->CartToJnt(Nomial, end_effector_pose, result);
@@ -168,7 +168,6 @@ bool IK_Solver::Solve(int limb, element &query, std::vector<double> &Q, bool out
     // Publish result
     if(output_enable)
     {
-        ROS_INFO("UPDATING CONFIGURATIONS");
         for(size_t i=0; i<JointNames.size(); ++i)
         for(size_t j=0; j<jointNames.size(); ++j)
             if(JointNames[i] == jointNames[j])

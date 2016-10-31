@@ -10,8 +10,8 @@ int main(int argc, char ** argv)
     double * temp;
 
     //Gait Generation
-    double totaltime = 11.5, tinit = 0.7, tend = 0.8, tstep = 1.0, ratio = 0.1, w = 0.4, wfoot = 0.1;
-    double Period = 0.01, htar = 0.2, lstep = 0.5, lfoot = 0.2, lthigh = 0.35, lshank = 0.35, z2 = 0.69;
+    double totaltime = 11.5, tinit = 0.7, tend = 0.8, tstep = 1.0, ratio = 0.1, w = 0.3, wfoot = 0.1;
+    double Period = 0.01, htar = 0.5, lstep = 0.6, lfoot = 0.22368, lthigh = 0.2977, lshank = 0.2977, z2 = 0.55;
     double Mtot = 80.0;
     double m1 = Mtot/5.0;
     double m3 = Mtot/5.0;

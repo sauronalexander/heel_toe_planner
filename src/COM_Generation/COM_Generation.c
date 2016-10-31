@@ -256,7 +256,7 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
   X_SS_Differential_Equa_Solver(g, z2, -Mtot * g * coef_x->data[0] / (m2 * z2),
     coef_x->data[1], coef_x->data[2], m3 * g * B3 / (m2 * z2) + m3 * x_end_pframe
     [1] * (w3 * w3) / (m2 * z2), w3, -b_pi, (-Mtot * coef_x->data[3] / m2 + m3 * O3 / m2)
-    + m1 * cdiff / m2, htar * lfoot, leftgait_x->data[(int)(Sample_init_SS + 1.0)
+    + m1 * cdiff / m2, htar * lfoot, rightgait_x->data[(int)(Sample_init_SS + 1.0)
     - 1] - x_end_heel_pframe[0], tinit, &A1_prime, &A3_prime, &Constant_prime_X,
     &C1_X, &C2_X);
 
@@ -305,8 +305,8 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
     tds, theta_ess, theta_iss, m1, m2, m3, ze, coef_x->data[4], coef_x->data[5],
     coef_x->data[6], coef_x->data[7], tinit, leftgait_x->data[(int)(Sample_init_SS
     + 1.0) - 1], rightgait_x->data[(int)(Sample_init_SS + 1.0) - 1] + lfoot,
-    leftgait_x->data[(int)(Sample_init_SS + 1.0) - 1] - x_end_heel_pframe[0],
-    rightgait_x->data[(int)(Sample_init_SS + 1.0) - 1] - x_init_heel_pframe[0],
+    x_trunk->data[(int)(Sample_init_SS + 1.0) - 1],
+    leftgait_x->data[(int)(Sample_init_SS + 1.0) - 1] - x_init_heel_pframe[0],
     x1, x2, x3, z1, z3, theta1, theta3);
   cdiff = w / 4.0;
   y3 = -w / 4.0;
@@ -343,7 +343,7 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
     /* X_Component */
     ndbl = zmpUB_x_t->data[(int)((offset + Sample_ss) + 1.0) - 1] + 0.5 * lfoot *
       cos((theta_ess[0] + theta_ess[1]) - theta_ess[2]);
-    cdiff = rightgait_x->data[(int)((offset + Sample_ss) + 1.0) - 1] -
+    cdiff = leftgait_x->data[(int)((offset + Sample_ss) + 1.0) - 1] -
       x_end_heel_pframe[0];
     O3 = 0.5 * (x_right->data[(int)(offset + 1.0) - 1] + ndbl);
     B3 = 0.5 * (ndbl - x_right->data[(int)(offset + 1.0) - 1]);
@@ -396,6 +396,7 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
     /* Double Support of Sample_init */
     /* Left foot in front */
     ndbl = x_trunk->data[(int)((offset + Sample_ss) + 1.0) - 1];
+    cdiff = rightgait_x->data[(int)(offset+Sample_ss+1.0)-1] - x_init_heel_pframe[0];
     X_DS_Differential_Equa_Solver(offset + Sample_ss, offset + Sample_step, t, g,
       z2, lfoot, tds, theta_ess, theta_iss, m1, m2, m3, ze, coef_x->data[jx + 3],
       coef_x->data[jx + 4], coef_x->data[jx + 5], coef_x->data[jx + 6], t->data
@@ -427,7 +428,7 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
     /* X_Component */
     ndbl = zmpUB_x_t->data[(int)((offset + Sample_ss) + 1.0) - 1] + 0.5 * lfoot *
       cos((theta_ess[0] + theta_ess[1]) - theta_ess[2]);
-    cdiff = leftgait_x->data[(int)((offset + Sample_ss) + 1.0) - 1] -
+    cdiff = rightgait_x->data[(int)((offset + Sample_ss) + 1.0) - 1] -
       x_end_heel_pframe[0];
     O3 = 0.5 * (x_left->data[(int)(offset + 1.0) - 1] + ndbl);
     B3 = 0.5 * (ndbl - x_left->data[(int)(offset + 1.0) - 1]);
@@ -479,6 +480,7 @@ void b_COM_Generation(double totaltime, double tinit, double tend, double tstep,
     /* Double Support of Sample_init */
     /* Left foot in front */
     ndbl = x_trunk->data[(int)((offset + Sample_ss) + 1.0) - 1];
+    cdiff = leftgait_x->data[(int)((offset + Sample_ss) + 1.0) - 1] - x_init_heel_pframe[0];
     X_DS_Differential_Equa_Solver(offset + Sample_ss, offset + Sample_step, t,
       g, z2, lfoot, tds, theta_ess, theta_iss, m1, m2, m3, ze, coef_x->data[jx +
       3], coef_x->data[jx + 4], coef_x->data[jx + 5], coef_x->data[jx + 6], t->

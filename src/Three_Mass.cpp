@@ -37,12 +37,12 @@ Three_Mass::Three_Mass(ros::NodeHandle & nh) : IK_Solver(nh), COM_Generation()
     double htar = 0.5;
     double lthigh = position_set[3][2] - position_set[4][2];
     double lshank = position_set[4][2] - position_set[5][2];
-    lthigh = 0.2977;
-    lshank = 0.2977;
+    lthigh = 0.2993;//0.2977;
+    lshank = 0.2993;//0.2977;
     this->trunk_offset = -1.0*position_set[0][2];
 
-    std::cout<<"trunk offset: "<<trunk_offset<<std::endl;
-    double w = 0.3;//2*position_set[0][1];
+    std::cout<<"Trunk offset: "<<trunk_offset<<std::endl;
+    double w = 0.23;//2*position_set[0][1];
     double lfoot = 0.22368;
     double wfoot = 0.14651;
 
@@ -62,15 +62,16 @@ void Three_Mass::Set_Mass(double mass_trunk, double mass_leg)
 
 void Three_Mass::Visualize()
 {
+    ROS_INFO("Start Visualization in RVIZ...");
     assert(!(x_left->size[1]^x_right->size[1]^x_trunk->size[1]^y_trunk->size[1]
             ^z_left->size[1]^z_right->size[1]^theta_left->size[1]^theta_right->size[1]));
     int NSample = (int) x_left->size[1];
     for(int i=0; i<NSample; i++)
     {
-        base.Set(x_trunk->data[i], y_trunk->data[i], z2+this->trunk_offset, 1, 0, 0, 0);
+        base.Set(x_trunk->data[i], -1.0*y_trunk->data[i], z2+this->trunk_offset, 1, 0, 0, 0);
         Eigen::Quaternion<double> base_ori;
         base_ori.setIdentity();
-        UpdateBase(x_trunk->data[i], y_trunk->data[i], z2+this->trunk_offset, base_ori);
+        UpdateBase(x_trunk->data[i], -1.0*y_trunk->data[i], z2+this->trunk_offset, base_ori);
 
         //Three Masses Transformation
 
@@ -80,16 +81,33 @@ void Three_Mass::Visualize()
         pcl::PointXYZ pos_right;
         ori_left.setZero();
         ori_right.setZero();
-        ori_left(0, 0) = cos(theta_left->data[i]);
-        ori_left(0, 2) = sin(theta_left->data[i]);
-        ori_left(1, 1) = 1.0;
-        ori_left(2, 0) = -1.0*sin(theta_left->data[i]);
-        ori_left(2, 2) = cos(theta_left->data[i]);
-        ori_right(0, 0) = cos(theta_right->data[i]);
-        ori_right(0, 2) = sin(theta_right->data[i]);
-        ori_right(1, 1) = 1.0;
-        ori_right(2, 0) = -1.0*sin(theta_right->data[i]);
-        ori_right(2, 2) = cos(theta_right->data[i]);
+
+        if(i > 1110)//temporary hard debug
+        {
+            ori_left(0, 0) = cos(theta_left->data[1110]);
+            ori_left(0, 2) = sin(theta_left->data[1110]);
+            ori_left(1, 1) = 1.0;
+            ori_left(2, 0) = -1.0*sin(theta_left->data[1110]);
+            ori_left(2, 2) = cos(theta_left->data[1110]);
+            ori_right(0, 0) = cos(theta_right->data[1110]);
+            ori_right(0, 2) = sin(theta_right->data[1110]);
+            ori_right(1, 1) = 1.0;
+            ori_right(2, 0) = -1.0*sin(theta_right->data[1110]);
+            ori_right(2, 2) = cos(theta_right->data[1110]);
+        }
+        else
+        {
+            ori_left(0, 0) = cos(theta_left->data[i]);
+            ori_left(0, 2) = sin(theta_left->data[i]);
+            ori_left(1, 1) = 1.0;
+            ori_left(2, 0) = -1.0*sin(theta_left->data[i]);
+            ori_left(2, 2) = cos(theta_left->data[i]);
+            ori_right(0, 0) = cos(theta_right->data[i]);
+            ori_right(0, 2) = sin(theta_right->data[i]);
+            ori_right(1, 1) = 1.0;
+            ori_right(2, 0) = -1.0*sin(theta_right->data[i]);
+            ori_right(2, 2) = cos(theta_right->data[i]);
+        }
         pos_left.x = x_left->data[i];
         pos_left.y = w/2.0;
         pos_left.z = z_left->data[i];
@@ -100,19 +118,41 @@ void Three_Mass::Visualize()
         element right = element(pos_right, ori_right);
         Left.pose = left;
         Right.pose = right;
-        Trunk.pose.Set(x_trunk->data[i], y_trunk->data[i], z2, 1, 0, 0, 0);
+        Trunk.pose.Set(x_trunk->data[i], -1.0*y_trunk->data[i], z2, 1, 0, 0, 0);
 
-        if(!Solve(1, Left.pose, Q, true))
+        bool left_solve = false;
+        bool right_solve = false;
+
+        for(int k=0; k<3; k++)
+            if(Solve(1, Left.pose, Q, true))
+            {
+                left_solve = true;
+                break;
+            }
+        for(int k=0; k<3; k++)
+            if(Solve(2, Right.pose, Q, true))
+            {
+                right_solve = true;
+                break;
+            }
+
+        if(!left_solve)
+        {
+            error_vector.push_back(i);
             ROS_FATAL_STREAM("Left Leg IK_ERROR on "<<i<<"th iteration");
-        else if(!Solve(2, Right.pose, Q, true))
+        }
+        else if(!right_solve)
+        {
+            error_vector.push_back(i);
             ROS_FATAL_STREAM("Right Leg IK_ERROR on "<<i<<"th iteration");
+        }
         else
         {
             //Publish the result: 1. Broadcast baseTF; 2. Publish Joint Angles
             eMatrixHom baseTf;
             baseTf.setIdentity();
             baseTf(0, 3) = x_trunk->data[i];
-            baseTf(1, 3) = y_trunk->data[i];
+            baseTf(1, 3) = -1.0*y_trunk->data[i];
             baseTf(2, 3) = this->trunk_offset;
             tf::Transform base_tf;
             pal::convert(baseTf, base_tf);
@@ -124,6 +164,8 @@ void Three_Mass::Visualize()
                 jointStateMsg.position[i] = Q[i];
             jointPub.publish(jointStateMsg);
         }
+        if(i%(NSample/10) == 0)
+            ROS_INFO_STREAM(10*i/(NSample/10)<<" percent completed!");
         ros::Duration(0.1).sleep();
 
     }
@@ -133,6 +175,8 @@ void Three_Mass::Visualize()
 void Three_Mass::Error()
 {
     COM_Generation::Error();
+    ROS_WARN_STREAM(error_vector.size()<<" invalid IK configurations");
+    ROS_WARN_STREAM("IK Fail Rate: "<<((double) error_vector.size()/(double)x_left->size[1]) * 100.0<<"%");
 }
 
 

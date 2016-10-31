@@ -244,4 +244,6 @@ void mldivide(const double A[4], const double B[2], double Y[2])
   Y[0] = (B[r1] - Y[1] * A[2 + r1]) / A[r1];
 }
 
+
+
 /* End of code generation (mldivide.c) */

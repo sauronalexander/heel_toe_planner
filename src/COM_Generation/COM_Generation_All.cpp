@@ -135,6 +135,7 @@ void COM_Generation::Generate_COM()
                    x_end_pframe, x_end_heel_pframe, theta_i, theta_e, zmpUB_x_t, zmpLB_x_t,
                    zmpUB_x, zmpLB_x, zmpUB_y, zmpLB_y, leftgait_x, rightgait_x, leftgait_y, rightgait_y,
                    z2, ze, zi, x_left, x_right, x_trunk, y_trunk, z_left, z_right, theta_left, theta_right);
+
 }
 
 void COM_Generation::Error()
