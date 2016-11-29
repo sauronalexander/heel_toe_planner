@@ -20,6 +20,14 @@
   <build_depend>pal_robot_tools</build_depend>
   <build_depend>pal_multicontact_planner</build_depend>
   <build_depend>cmake_modules</build_depend>
+  <build_depend>gazebo_msgs</build_depend>
+  <build_depend>std_srvs</build_depend>
+  <build_depend>rosgraph_msgs</build_depend>
+  <build_depend>dynamic_reconfigure</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>gazebo</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>rbdl</run_depend>
@@ -31,7 +39,13 @@
   <run_depend>pal_robot_tools</run_depend>
   <run_depend>pal_multicontact_planner</run_depend>
   <run_depend>cmake_modules</run_depend>
-
+  <run_depend>gazebo_msgs</run_depend>
+  <run_depend>gazebo7</run_depend>
+  <run_depend>std_srvs</run_depend>
+  <run_depend>rosgraph_msgs</run_depend>
+  <run_depend>dynamic_reconfigure</run_depend>
+  <run_depend>message_generation</run_depend>
+  <run_depend>std_msgs</run_depend>
 
 
 

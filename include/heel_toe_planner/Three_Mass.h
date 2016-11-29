@@ -8,6 +8,13 @@
 #include <cassert>
 #include <sensor_msgs/JointState.h>
 #include <pcl/point_cloud.h>
+#include <gazebo_ros_control/robot_hw_sim.h>
+#include <gazebo_ros_control/default_robot_hw_sim.h>
+#include <sensor_msgs/Imu.h>
+#include <geometry_msgs/Wrench.h>
+#include <sensor_msgs/JointState.h>
+#include <gazebo/msgs/MessageTypes.hh>
+#include <gazebo/gazebo.hh>
 
 
 
@@ -17,7 +24,7 @@ typedef struct Mass_Info
     double mass;
 } Mass_Info;
 
-class Three_Mass : public IK_Solver, public COM_Generation
+class Three_Mass : public IK_Solver, public COM_Generation, public hardware_interface::RobotHW
 {
     private:
         Mass_Info Trunk;
@@ -37,8 +44,14 @@ class Three_Mass : public IK_Solver, public COM_Generation
         Three_Mass(ros::NodeHandle & nh);
         void Set_Mass(double mass_trunk, double mass_leg);
         void Visualize();
-        ~Three_Mass();
+        virtual ~Three_Mass();
         void Error();
+        //Talk to HW
+        void read();
+        void write();
+        //Reimplement only if needed
+        //virtual bool checkForConflict() const;
+
 
 };
 

@@ -35,13 +35,15 @@ class IK_Solver
 
 
     protected:
-        std::vector<std::string> jointNames;
+
         ros::NodeHandle nh;
         eMatrixHom getFK(const Eigen::VectorXd &state, const Eigen::VectorXd pointOffset,
                          const std::string &linkName, bool updateKinematics);
-        RigidBodyDynamics::Model robotModel;
+
 
     public:
+        RigidBodyDynamics::Model robotModel;
+        std::vector<std::string> jointNames;
         IK_Solver(ros::NodeHandle & nh);
         virtual ~IK_Solver();
         bool Solve(int limb, element &query, std::vector<double> & Q, bool output_enable);

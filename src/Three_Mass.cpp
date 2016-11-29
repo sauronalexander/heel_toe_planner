@@ -179,4 +179,8 @@ void Three_Mass::Error()
     ROS_WARN_STREAM("IK Fail Rate: "<<((double) error_vector.size()/(double)x_left->size[1]) * 100.0<<"%");
 }
 
+void Three_Mass::read()
+{}
 
+void Three_Mass::write()
+{}
