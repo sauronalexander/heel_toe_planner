@@ -47,8 +47,6 @@ class COM_Generation
 		emxArray_real_T * zmpLB_y;
 		emxArray_real_T * zmpLB_x_t;
 		emxArray_real_T * zmpUB_x_t;
-        emxArray_real_T * zmp_x;
-        emxArray_real_T * zmp_y;
         emxArray_real_T * delta_y;
         emxArray_real_T * coef_x;
         emxArray_real_T * coef_y;
@@ -93,6 +91,8 @@ class COM_Generation
         emxArray_real_T * z_right;
         emxArray_real_T * theta_left;
         emxArray_real_T * theta_right;
+        emxArray_real_T * zmp_x;
+        emxArray_real_T * zmp_y;
         double z2;
         double zi;
         double ze;

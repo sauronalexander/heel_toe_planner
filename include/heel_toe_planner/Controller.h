@@ -6,6 +6,7 @@
 #include <control_msgs/JointTrajectoryAction.h>
 #include <rbdl/addons/rbdlUrdfParser.h>
 #include <heel_toe_planner/Three_Mass.h>
+#include <control_msgs/FollowJointTrajectoryAction.h>
 
 typedef actionlib::SimpleActionClient<control_msgs::JointTrajectoryAction> TrajClient;
 
@@ -23,7 +24,7 @@ class Reemc_Trajectory_Control: public Three_Mass
        Reemc_Trajectory_Control(ros::NodeHandle &nh);
        virtual ~Reemc_Trajectory_Control();
        //void startTrajectory(control_msgs::JointTrajectoryGoal goal);
-       control_msgs::JointTrajectoryGoal ExtendTrajectory(int step, int leg);
+       control_msgs::FollowJointTrajectoryActionGoal ExtendTrajectory(int step, int leg);
        void Step();
        //actionlib::SimpleClientGoalState getState();
 };

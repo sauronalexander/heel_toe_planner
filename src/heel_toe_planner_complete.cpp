@@ -20,7 +20,8 @@ int main(int argc, char** argv)
     ThreeMassModel.Set_Parameters(totaltime, tinit, tend, tstep, ratio, Period, lstep, z2);
     ThreeMassModel.Set_Mass(48.0, 16.0);
     ThreeMassModel.Generate_COM();
-    ThreeMassModel.Visualize();
+    ThreeMassModel.Generate_Reference_Angles(false);
     ThreeMassModel.Error();
+    ThreeMassModel.write();
     return 0;
 }

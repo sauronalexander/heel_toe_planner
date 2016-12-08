@@ -230,6 +230,7 @@ void ZMP_Generation(emxArray_real_T * zmpLB_x_t, emxArray_real_T * zmpUB_x_t, do
 
   Quadratic_Cosine_Interpolation(tinit, delta12, delta23, w / 2.0, w / 2.0 -
     wfoot / 2.0, -w / 2.0 + wfoot / 2.0, 0.0, dv11);
+
   for (i12 = 0; i12 < 6; i12++) {
     coef_y->data[i12] = dv11[i12];
   }

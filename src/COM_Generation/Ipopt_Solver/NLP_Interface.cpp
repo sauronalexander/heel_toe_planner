@@ -4,10 +4,10 @@ double NLP1_Solver(double yzmp_1, double delta13, double yzmp_1_prime, double yz
 {
     Ipopt::SmartPtr<Ipopt::TNLP> mynlp = new NLP1(yzmp_1, delta13, yzmp_1_prime, yzmp_3);
     Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
+
     app->Options()->SetNumericValue("tol", 1e-9);
     app->Options()->SetStringValue("mu_strategy", "adaptive");
     app->Options()->SetIntegerValue("print_level", 0);
-
 
     Ipopt::ApplicationReturnStatus status;
     status = app->Initialize();
@@ -16,6 +16,7 @@ double NLP1_Solver(double yzmp_1, double delta13, double yzmp_1_prime, double yz
         ROS_ERROR_STREAM("*** Error during initialization!");
         return (int) status;
     }
+
     status = app->OptimizeTNLP(mynlp);
     if (status != Ipopt::Solve_Succeeded) {
         // Retrieve some statistics about the solve

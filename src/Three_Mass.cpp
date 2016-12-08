@@ -60,9 +60,11 @@ void Three_Mass::Set_Mass(double mass_trunk, double mass_leg)
     COM_Generation::Set_Mass(mass_trunk+2*mass_leg, mass_leg, mass_trunk, mass_leg, 9.8);
 }
 
-void Three_Mass::Visualize()
+void Three_Mass::Generate_Reference_Angles(bool visualize)
 {
-    ROS_INFO("Start Visualization in RVIZ...");
+    ROS_INFO("Start Generation of Reference Angles...");
+    if(visualize)
+        ROS_INFO("Start Visualization in RVIZ...");
     assert(!(x_left->size[1]^x_right->size[1]^x_trunk->size[1]^y_trunk->size[1]
             ^z_left->size[1]^z_right->size[1]^theta_left->size[1]^theta_right->size[1]));
     int NSample = (int) x_left->size[1];
@@ -156,17 +158,21 @@ void Three_Mass::Visualize()
             baseTf(2, 3) = this->trunk_offset;
             tf::Transform base_tf;
             pal::convert(baseTf, base_tf);
-            br.sendTransform(tf::StampedTransform(base_tf, ros::Time::now(), "/world", "/base_link"));
+            if(visualize)
+                br.sendTransform(tf::StampedTransform(base_tf, ros::Time::now(), "/world", "/base_link"));
             jointStateMsg.header.stamp = ros::Time::now();
             jointStateMsg.name = jointNames;
             jointStateMsg.position.resize(jointNames.size());
             for(size_t i=0; i<jointNames.size(); i++)
                 jointStateMsg.position[i] = Q[i];
-            jointPub.publish(jointStateMsg);
+            this->Reference_Angles.push_back(Q);
+            if(visualize)
+                jointPub.publish(jointStateMsg);
         }
         if(i%(NSample/10) == 0)
             ROS_INFO_STREAM(10*i/(NSample/10)<<" percent completed!");
-        ros::Duration(0.1).sleep();
+        if(visualize)
+            ros::Duration(0.1).sleep();
 
     }
 
@@ -180,7 +186,178 @@ void Three_Mass::Error()
 }
 
 void Three_Mass::read()
-{}
+{
+    std::string path = ros::package::getPath("heel_toe_planner");
+    std::string temp_path;
+
+    ROS_INFO_STREAM("Begin Fetching Of Reference Angles...");
+    temp_path = path + "/Reference_Angles.bin";
+    ROS_INFO_STREAM("From File: "<<temp_path);
+    std::ifstream ifs1(temp_path.c_str());
+    boost::archive::binary_iarchive ia1(ifs1);
+    int num_joint_angles;
+    ia1 >> num_joint_angles;
+    for(int i=0; i<num_joint_angles; i++)
+    {
+        std::vector<double> joint_config;
+        ia1 >> joint_config;
+        this->Reference_Angles.push_back(joint_config);
+    }
+    ifs1.close();
+    ROS_INFO_STREAM("Fetching of Reference Angles Completed...");
+
+
+    ROS_INFO_STREAM("Begin Fetching Of Reference ZMP Trajectories...");
+    temp_path = path + "/ZMP_Trajectories.bin";
+    ROS_INFO_STREAM("From File: "<<temp_path);
+    std::ifstream ifs2(temp_path.c_str());
+    boost::archive::binary_iarchive ia2(ifs2);
+    int size;
+    int size_array;
+
+    ia2 >> size;
+    emxInit_real_T(&this->zmp_x, 2);
+    size_array = this->zmp_x->size[0] * this->zmp_x->size[1];
+    this->zmp_x->size[0] = 1;
+    this->zmp_x->size[1] = size;
+    emxEnsureCapacity((emxArray__common *) zmp_x, size_array, (int)sizeof(double));
+    for(int i=0; i<this->zmp_x->size[1]; i++)
+        ia2 >> this->zmp_x->data[i];
+
+    ia2 >> size;
+    emxInit_real_T(&this->zmp_y, 2);
+    size_array = this->zmp_y->size[0] * this->zmp_y->size[1];
+    this->zmp_y->size[0] = 1;
+    this->zmp_y->size[1] = size;
+    emxEnsureCapacity((emxArray__common *) zmp_y, size_array, (int)sizeof(double));
+    for(int i=0; i<this->zmp_y->size[1]; i++)
+        ia2 >> this->zmp_y->data[i];
+    ifs2.close();
+    ROS_INFO_STREAM("Fecthing of Reference ZMP Trajectories Completed...");
+}
 
 void Three_Mass::write()
-{}
+{
+    assert(this->Reference_Angles.size());
+    std::string path = ros::package::getPath("heel_toe_planner");
+    std::string temp_path;
+
+    ROS_INFO_STREAM("Begin Serialization Of Reference Angles...");
+    temp_path = path + "/Reference_Angles.bin";
+    ROS_INFO_STREAM("Saving To File: "<<temp_path);
+    std::ofstream ofs1(temp_path.c_str());
+    boost::archive::binary_oarchive oa1(ofs1);
+    int size = (int) this->Reference_Angles.size();
+    oa1 << size;
+    for(size_t i=0; i<Reference_Angles.size(); i++)
+        oa1 << this->Reference_Angles[i];
+    ofs1.close();
+    ROS_INFO_STREAM("Serialization of Reference Angles Completed...");
+
+
+    ROS_INFO_STREAM("Begin Serialization Of Reference ZMP Trajectories...");
+    temp_path = path + "/ZMP_Trajectories.bin";
+    ROS_INFO_STREAM("Saving To File: "<<temp_path);
+    std::ofstream ofs2(temp_path.c_str());
+    boost::archive::binary_oarchive oa2(ofs2);
+    oa2 << this->zmp_x->size[1];
+    for(int i=0; i<this->zmp_x->size[1]; i++)
+        oa2 << this->zmp_x->data[i];
+    oa2 << this->zmp_y->size[1];
+    for(int i=0; i<this->zmp_y->size[1]; i++)
+        oa2 << this->zmp_y->data[i];
+    ofs2.close();
+    ROS_INFO_STREAM("Serialization of Reference ZMP Trajectories Completed...");
+
+    if(Verify())
+        ROS_INFO_STREAM("Serialization Complete");
+    else
+        ROS_ERROR_STREAM("Serialization Failed");
+
+}
+
+bool Three_Mass::Verify()
+{
+    std::string path = ros::package::getPath("heel_toe_planner");
+    std::string temp_path;
+
+    ROS_INFO_STREAM("Begin Fetching Of Reference Angles...");
+    temp_path = path + "/Reference_Angles.bin";
+    ROS_INFO_STREAM("From File: "<<temp_path);
+    std::ifstream ifs1(temp_path.c_str());
+    boost::archive::binary_iarchive ia1(ifs1);
+    int num_joint_angles;
+    ia1 >> num_joint_angles;
+    if(num_joint_angles != this->Reference_Angles.size())
+        return false;
+    std::vector<std::vector<double> > Reference_Angles_prime;
+    for(int i=0; i<num_joint_angles; i++)
+    {
+        std::vector<double> joint_config;
+        ia1 >> joint_config;
+        Reference_Angles_prime.push_back(joint_config);
+    }
+    for(size_t i=0; i<Reference_Angles_prime.size(); i++)
+    {
+        if(Reference_Angles_prime[i].size() != this->Reference_Angles[i].size())
+            return false;
+        for(size_t j=0; j<Reference_Angles_prime[j].size(); j++)
+            if(Reference_Angles_prime[i][j] != this->Reference_Angles[i][j])
+                return false;
+    }
+    ifs1.close();
+    ROS_INFO_STREAM("Fetching of Reference Angles Completed...");
+
+
+    ROS_INFO_STREAM("Begin Fetching Of Reference ZMP Trajectories...");
+    temp_path = path + "/ZMP_Trajectories.bin";
+    ROS_INFO_STREAM("From File: "<<temp_path);
+    bool flag = true;
+    std::ifstream ifs2(temp_path.c_str());
+    boost::archive::binary_iarchive ia2(ifs2);
+    int size;
+    int size_array;
+
+    emxArray_real_T* zmp_x_prime;
+    emxArray_real_T* zmp_y_prime;
+    zmp_x_prime = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
+    zmp_y_prime = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
+    Initial_emxArry(zmp_x_prime);
+    Initial_emxArry(zmp_y_prime);
+
+    ia2 >> size;
+    emxInit_real_T(&zmp_x_prime, 2);
+    size_array = zmp_x_prime->size[0] * zmp_x_prime->size[1];
+    zmp_x_prime->size[0] = 1;
+    zmp_x_prime->size[1] = size;
+    if(zmp_x->size[1] != size)
+        flag = false;
+    emxEnsureCapacity((emxArray__common *) zmp_x_prime, size_array, (int)sizeof(double));
+    for(int i=0; i<zmp_x_prime->size[1]; i++)
+    {
+        ia2 >> zmp_x_prime->data[i];
+        if(zmp_x_prime->data[i] != this->zmp_x->data[i])
+            flag = false;
+    }
+
+    ia2 >> size;
+    emxInit_real_T(&zmp_y_prime, 2);
+    size_array = zmp_y_prime->size[0] * zmp_y_prime->size[1];
+    zmp_y_prime->size[0] = 1;
+    zmp_y_prime->size[1] = size;
+    emxEnsureCapacity((emxArray__common *) zmp_y_prime, size_array, (int)sizeof(double));
+    for(int i=0; i<zmp_y_prime->size[1]; i++)
+    {
+        ia2 >> zmp_y_prime->data[i];
+        if(zmp_y_prime->data[i] != this->zmp_y->data[i])
+            flag = false;
+    }
+    ROS_INFO_STREAM("Fecthing of Reference ZMP Trajectories Completed...");
+
+    Delete_emxArry(zmp_x_prime);
+    Delete_emxArry(zmp_y_prime);
+    zmp_x_prime = NULL;
+    zmp_y_prime = NULL;
+    ifs2.close();
+    return flag;
+}

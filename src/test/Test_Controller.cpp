@@ -12,9 +12,12 @@ int main(int argc, char** argv)
     ros::NodeHandle nh;
     //create client
     Reemc_Trajectory_Control control(nh);
+    double totaltime = 11.5, tinit = 0.7, tend = 0.8, tstep = 1, ratio = 0.1, Period = 0.01;
+    double z2 = 0.55, lstep = 0.6;
+    control.Set_Parameters(totaltime, tinit, tend, tstep, ratio, Period, lstep, z2);
+    control.Set_Mass(48.0, 16.0);
+    control.read();
     control.Step();
-
-
 
     return 0;
 }

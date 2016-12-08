@@ -1,6 +1,8 @@
 #ifndef THREE_MASS_H
 #define THREE_MASS_H
 
+#include <ros/ros.h>
+#include <ros/package.h>
 #include <heel_toe_planner/IK_Solver.h>
 #include <pal_multicontact_planner/element.h>
 #include <heel_toe_planner/COM_Generation/COM_Generation_All.h>
@@ -16,6 +18,14 @@
 #include <gazebo/msgs/MessageTypes.hh>
 #include <gazebo/gazebo.hh>
 
+//Serialization
+#include <fstream>
+#include <sstream>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/serialization/utility.hpp>
+#include <boost/serialization/tracking.hpp>
+#include <boost/serialization/vector.hpp>
 
 
 typedef struct Mass_Info
@@ -32,18 +42,20 @@ class Three_Mass : public IK_Solver, public COM_Generation, public hardware_inte
         Mass_Info Right;
         element base;
         double trunk_offset;
+        std::vector<double> Q;
+        bool Verify();
 
     protected:
         ros::Publisher jointPub;
         tf::TransformBroadcaster br;
         sensor_msgs::JointState jointStateMsg;
-        std::vector<double> Q;
+        std::vector<std::vector<double> > Reference_Angles;
         std::vector<int> error_vector;
 
     public:
         Three_Mass(ros::NodeHandle & nh);
         void Set_Mass(double mass_trunk, double mass_leg);
-        void Visualize();
+        void Generate_Reference_Angles(bool visualize);
         virtual ~Three_Mass();
         void Error();
         //Talk to HW

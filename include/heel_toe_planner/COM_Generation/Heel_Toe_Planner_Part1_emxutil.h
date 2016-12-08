@@ -21,6 +21,10 @@
 #include "heel_toe_planner/COM_Generation/Heel_Toe_Planner_Part1_types.h"
 
 /* Function Declarations */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern void emxEnsureCapacity(emxArray__common *emxArray, int oldNumel, int elementSize);
 extern void emxFree_boolean_T(emxArray_boolean_T **pEmxArray);
 extern void emxFree_int32_T(emxArray_int32_T **pEmxArray);
@@ -28,5 +32,10 @@ extern void emxFree_real_T(emxArray_real_T **pEmxArray);
 extern void emxInit_boolean_T(emxArray_boolean_T **pEmxArray, int numDimensions);
 extern void emxInit_int32_T(emxArray_int32_T **pEmxArray, int numDimensions);
 extern void emxInit_real_T(emxArray_real_T **pEmxArray, int numDimensions);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 /* End of code generation (Heel_Toe_Planner_Part1_emxutil.h) */

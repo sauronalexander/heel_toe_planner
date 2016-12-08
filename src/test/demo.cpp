@@ -13,7 +13,6 @@
 #include <gazebo/msgs/joint_cmd.pb.h>
 #include <gazebo/gazebo_config.h>
 #include <gazebo/Server.hh>
-#include <gazebo/gazebo_client.hh>
 #include <gazebo/math/gzmath.hh>
 #include <controller_manager/controller_manager.h>
 #include <gazebo_msgs/SetJointProperties.h>
