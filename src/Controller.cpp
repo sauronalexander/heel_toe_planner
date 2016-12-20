@@ -89,7 +89,8 @@ control_msgs::FollowJointTrajectoryActionGoal Reemc_Trajectory_Control::ExtendTr
             goal.goal.trajectory.points[j].positions.resize(goal.goal.trajectory.joint_names.size());
             for(size_t i=0; i<5; i++)
                 goal.goal.trajectory.points[j].positions[i] = this->Reference_Angles[j][i];
-            goal.goal.trajectory.points[j].time_from_start = ros::Duration(0.1*(double) j);
+            double index = (double) j;
+            goal.goal.trajectory.points[j].time_from_start = ros::Duration(0.1*index);
         }
 
 
@@ -106,7 +107,8 @@ control_msgs::FollowJointTrajectoryActionGoal Reemc_Trajectory_Control::ExtendTr
             goal.goal.trajectory.points[j].positions.resize(goal.goal.trajectory.joint_names.size());
             for(size_t i=0; i<5; i++)
                 goal.goal.trajectory.points[j].positions[i] = this->Reference_Angles[j][i+6];
-            goal.goal.trajectory.points[j].time_from_start = ros::Duration(0.1*(double) j);
+            double index = (double) j;
+            goal.goal.trajectory.points[j].time_from_start = ros::Duration(0.1*index);
         }
 
     }
