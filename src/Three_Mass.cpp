@@ -5,6 +5,14 @@ Three_Mass::Three_Mass(ros::NodeHandle & nh) : IK_Solver(nh), COM_Generation()
     //Initialize Publisher
     jointPub = nh.advertise<sensor_msgs::JointState>("/joint_states", 100);
     //Initialize Joint State Message
+    eMatrixHom baseTf;
+    baseTf.setIdentity();
+    baseTf(0, 3) = 0;
+    baseTf(1, 3) = 0;
+    baseTf(2, 3) = 0.85;
+    tf::Transform base_tf;
+    pal::convert(baseTf, base_tf);
+    br.sendTransform(tf::StampedTransform(base_tf, ros::Time::now(), "/world", "/base_link"));
     jointStateMsg.header.stamp = ros::Time::now();
     jointStateMsg.name = this->jointNames;
     assert(jointNames.size());
@@ -67,6 +75,7 @@ void Three_Mass::Generate_Reference_Angles(bool visualize)
         ROS_INFO("Start Visualization in RVIZ...");
     assert(!(x_left->size[1]^x_right->size[1]^x_trunk->size[1]^y_trunk->size[1]
             ^z_left->size[1]^z_right->size[1]^theta_left->size[1]^theta_right->size[1]));
+
     int NSample = (int) x_left->size[1];
     for(int i=0; i<NSample; i++)
     {
@@ -76,7 +85,6 @@ void Three_Mass::Generate_Reference_Angles(bool visualize)
         UpdateBase(x_trunk->data[i], -1.0*y_trunk->data[i], z2+this->trunk_offset, base_ori);
 
         //Three Masses Transformation
-
         Eigen::Matrix3d ori_left;
         Eigen::Matrix3d ori_right;
         pcl::PointXYZ pos_left;
@@ -191,12 +199,13 @@ void Three_Mass::read()
     std::string temp_path;
 
     ROS_INFO_STREAM("Begin Fetching Of Reference Angles...");
-    temp_path = path + "/Reference_Angles.bin";
+    temp_path = path + "/database/Reference_Angles.bin";
     ROS_INFO_STREAM("From File: "<<temp_path);
     std::ifstream ifs1(temp_path.c_str());
     boost::archive::binary_iarchive ia1(ifs1);
     int num_joint_angles;
     ia1 >> num_joint_angles;
+    ia1 >> this->Standing_Pose;
     for(int i=0; i<num_joint_angles; i++)
     {
         std::vector<double> joint_config;
@@ -208,7 +217,7 @@ void Three_Mass::read()
 
 
     ROS_INFO_STREAM("Begin Fetching Of Reference ZMP Trajectories...");
-    temp_path = path + "/ZMP_Trajectories.bin";
+    temp_path = path + "/database/ZMP_Trajectories.bin";
     ROS_INFO_STREAM("From File: "<<temp_path);
     std::ifstream ifs2(temp_path.c_str());
     boost::archive::binary_iarchive ia2(ifs2);
@@ -239,16 +248,20 @@ void Three_Mass::read()
 void Three_Mass::write()
 {
     assert(this->Reference_Angles.size());
+    if(!this->Standing_Pose.size())
+        Solve_Standing_Pose();
+    assert(this->Standing_Pose.size());
     std::string path = ros::package::getPath("heel_toe_planner");
     std::string temp_path;
 
     ROS_INFO_STREAM("Begin Serialization Of Reference Angles...");
-    temp_path = path + "/Reference_Angles.bin";
+    temp_path = path + "/database/Reference_Angles.bin";
     ROS_INFO_STREAM("Saving To File: "<<temp_path);
     std::ofstream ofs1(temp_path.c_str());
     boost::archive::binary_oarchive oa1(ofs1);
     int size = (int) this->Reference_Angles.size();
     oa1 << size;
+    oa1 << this->Standing_Pose;
     for(size_t i=0; i<Reference_Angles.size(); i++)
         oa1 << this->Reference_Angles[i];
     ofs1.close();
@@ -256,7 +269,7 @@ void Three_Mass::write()
 
 
     ROS_INFO_STREAM("Begin Serialization Of Reference ZMP Trajectories...");
-    temp_path = path + "/ZMP_Trajectories.bin";
+    temp_path = path + "/database/ZMP_Trajectories.bin";
     ROS_INFO_STREAM("Saving To File: "<<temp_path);
     std::ofstream ofs2(temp_path.c_str());
     boost::archive::binary_oarchive oa2(ofs2);
@@ -282,12 +295,19 @@ bool Three_Mass::Verify()
     std::string temp_path;
 
     ROS_INFO_STREAM("Begin Fetching Of Reference Angles...");
-    temp_path = path + "/Reference_Angles.bin";
+    temp_path = path + "/database/Reference_Angles.bin";
     ROS_INFO_STREAM("From File: "<<temp_path);
     std::ifstream ifs1(temp_path.c_str());
     boost::archive::binary_iarchive ia1(ifs1);
     int num_joint_angles;
     ia1 >> num_joint_angles;
+    std::vector<double> stand;
+    ia1 >> stand;
+    if(this->Standing_Pose.size() != stand.size())
+        return false;
+    for(size_t i =0; i<this->Standing_Pose.size(); i++)
+        if(this->Standing_Pose[i] != stand[i])
+            return false;
     if(num_joint_angles != this->Reference_Angles.size())
         return false;
     std::vector<std::vector<double> > Reference_Angles_prime;
@@ -310,7 +330,7 @@ bool Three_Mass::Verify()
 
 
     ROS_INFO_STREAM("Begin Fetching Of Reference ZMP Trajectories...");
-    temp_path = path + "/ZMP_Trajectories.bin";
+    temp_path = path + "/database/ZMP_Trajectories.bin";
     ROS_INFO_STREAM("From File: "<<temp_path);
     bool flag = true;
     std::ifstream ifs2(temp_path.c_str());
@@ -360,4 +380,67 @@ bool Three_Mass::Verify()
     zmp_y_prime = NULL;
     ifs2.close();
     return flag;
+}
+
+void Three_Mass::Solve_Standing_Pose()
+{
+    ROS_INFO("Start Generating Default Standing Pose...");
+    base.Set(x_trunk->data[0], 0, z2+this->trunk_offset, 1, 0, 0, 0);
+    Eigen::Quaternion<double> base_ori;
+    base_ori.setIdentity();
+    UpdateBase(x_trunk->data[0], 0, z2+this->trunk_offset, base_ori);
+
+    //Solve For Standing Pose
+    this->Standing_Pose.resize(this->jointNames.size());
+    Eigen::Matrix3d ori_left;
+    Eigen::Matrix3d ori_right;
+    pcl::PointXYZ pos_left;
+    pcl::PointXYZ pos_right;
+    ori_left.setZero();
+    ori_right.setZero();
+
+    pos_left.x = x_left->data[0];
+    pos_left.y = w/2.0;
+    pos_left.z = 0.0;
+    pos_right.x = x_right->data[0];
+    pos_right.y = -1.0*w/2.0;
+    pos_right.z = z_right->data[0];
+
+    ori_right(0, 0) = cos(theta_right->data[0]);
+    ori_right(0, 2) = sin(theta_right->data[0]);
+    ori_right(1, 1) = 1.0;
+    ori_right(2, 0) = -1.0*sin(theta_right->data[0]);
+    ori_right(2, 2) = cos(theta_right->data[0]);
+
+    ori_left = ori_right;
+
+    element left = element(pos_left, ori_left);
+    element right = element(pos_right, ori_right);
+
+    Left.pose = left;
+    Right.pose = right;
+    //Trunk.pose.Set(x_trunk->data[0], -1.0*y_trunk->data[0], z2, 1, 0, 0, 0);
+
+    bool left_solve = false;
+    bool right_solve = false;
+
+    for(int k=0; k<3; k++)
+        if(Solve(1, Left.pose, this->Standing_Pose, true))
+        {
+            left_solve = true;
+            break;
+        }
+    for(int k=0; k<3; k++)
+        if(Solve(2, Right.pose, this->Standing_Pose, true))
+        {
+            right_solve = true;
+            break;
+        }
+    if(!right_solve)
+        ROS_ERROR("Right Foot Standing Pose Error!");
+    if(!left_solve)
+        ROS_ERROR("Left Foot Standing Pose Error!");
+
+//    for(size_t i=0; i<this->Standing_Pose.size();i++)
+//        std::cout<<Standing_Pose[i]<<std::endl;
 }

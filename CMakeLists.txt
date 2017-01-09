@@ -8,11 +8,11 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 find_package(IPOPT REQUIRED)
 if(IPOPT_FOUND)
   link_directories(${IPOPT_LIBRARY_DIRS})
-    message([STATUS]"${IPOPT_LIBRARY_DIRS}")
 endif()
 find_package(roscpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(gazebo REQUIRED)
+find_package(geometry_msgs REQUIRED)
 if(gazebo_FOUND)
     link_directories(${GAZEBO_LIBRARY_DIRS})
 endif()
@@ -29,7 +29,9 @@ find_package(catkin REQUIRED COMPONENTS	roscpp
 					rosgraph_msgs
 					dynamic_reconfigure
 					message_generation
-					std_srvs
+                    std_srvs
+                    geometry_msgs
+                    message_generation
 
 )
 
@@ -40,15 +42,20 @@ set(CMAKE_C_FLAGS "-std=c99 ${CMAKE_C_FLAGS} ")
 #set(CMAKE_LINK_LIBRARY_FLAG "-Wl,--rpath -Wl,/home/viki/Desktop/CoinIpopt/build/lib ${CMAKE_LINK_LIBRARY_FLAG}")
 #set(CMAKE_CXX_LINKER_PREFERENCE "-Wl,--rpath -Wl,/home/viki/Desktop/CoinIpopt/build/lib ${CMAKE_CXX_LINKER_PREFERENCE}")
 
-
-
-catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES ${PROJECT_NAME}
-  CATKIN_DEPENDS roscpp visualization_msgs tf trac_ik_lib std_srvs rosgraph_msgs dynamic_reconfigure message_generation std_msgs gazebo_msgs
-  DEPENDS orocos_kdl
+add_message_files(
+  FILES ZMPCoordinate.msg
 )
 
+generate_messages(
+  DEPENDENCIES std_msgs
+)
+
+catkin_package(
+  INCLUDE_DIRS include/
+  LIBRARIES ${PROJECT_NAME} pasl octree
+  CATKIN_DEPENDS roscpp visualization_msgs tf trac_ik_lib std_srvs rosgraph_msgs dynamic_reconfigure message_generation std_msgs gazebo_msgs geometry_msgs message_runtime
+  DEPENDS orocos_kdl
+)
 
 include_directories(
     include
@@ -116,6 +123,8 @@ add_executable(test_com_gen src/test/Test_COM_Generation.cpp)
 add_executable(test_nonlinear_solver src/test/Test_Solver.cpp)
 add_executable(heel_toe_planner_complete src/heel_toe_planner_complete.cpp)
 add_executable(test_controller src/test/Test_Controller.cpp)
+add_executable(test_zmp_tracking src/test/Test_ZMP_Tracking.cpp)
+add_executable(zmp_tracking src/ZMP_Tracking.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
@@ -126,6 +135,8 @@ target_link_libraries(test_com_gen ${PROJECT_NAME})
 target_link_libraries(test_nonlinear_solver ${PROJECT_NAME})
 target_link_libraries(heel_toe_planner_complete ${PROJECT_NAME})
 target_link_libraries(test_controller ${PROJECT_NAME})
+target_link_libraries(test_zmp_tracking ${PROJECT_NAME})
+target_link_libraries(zmp_tracking ${PROJECT_NAME})
 
 install(TARGETS ${PROJECT_NAME}
     DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
@@ -140,3 +151,4 @@ install(DIRECTORY gazebo/launch
 
 install(DIRECTORY gazebo/worlds
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+

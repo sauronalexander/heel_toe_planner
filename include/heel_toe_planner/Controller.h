@@ -2,6 +2,7 @@
 #define CONTROLLER_H
 
 #include <ros/ros.h>
+#include <std_srvs/Empty.h>
 #include <actionlib/client/simple_action_client.h>
 #include <control_msgs/JointTrajectoryAction.h>
 #include <rbdl/addons/rbdlUrdfParser.h>
@@ -16,15 +17,19 @@ class Reemc_Trajectory_Control: public Three_Mass
        TrajClient* traj_client_;
        ros::Publisher pub_left_leg;
        ros::Publisher pub_right_leg;
+       control_msgs::FollowJointTrajectoryActionGoal ExtendTrajectory(int step, int leg);
+       control_msgs::FollowJointTrajectoryActionGoal DefaultPose(int leg);
+       void Debug();
 
    protected:
        ros::NodeHandle nh;
 
    public:
        Reemc_Trajectory_Control(ros::NodeHandle &nh);
+
        virtual ~Reemc_Trajectory_Control();
        //void startTrajectory(control_msgs::JointTrajectoryGoal goal);
-       control_msgs::FollowJointTrajectoryActionGoal ExtendTrajectory(int step, int leg);
+
        void Step();
        //actionlib::SimpleClientGoalState getState();
 };

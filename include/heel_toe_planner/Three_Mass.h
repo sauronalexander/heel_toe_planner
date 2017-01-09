@@ -44,6 +44,7 @@ class Three_Mass : public IK_Solver, public COM_Generation, public hardware_inte
         double trunk_offset;
         std::vector<double> Q;
         bool Verify();
+        void Solve_Standing_Pose();
 
     protected:
         ros::Publisher jointPub;
@@ -51,11 +52,13 @@ class Three_Mass : public IK_Solver, public COM_Generation, public hardware_inte
         sensor_msgs::JointState jointStateMsg;
         std::vector<std::vector<double> > Reference_Angles;
         std::vector<int> error_vector;
+        std::vector<double> Standing_Pose;
 
     public:
         Three_Mass(ros::NodeHandle & nh);
         void Set_Mass(double mass_trunk, double mass_leg);
         void Generate_Reference_Angles(bool visualize);
+        
         virtual ~Three_Mass();
         void Error();
         //Talk to HW
