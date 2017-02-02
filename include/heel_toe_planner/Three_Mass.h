@@ -41,12 +41,13 @@ class Three_Mass : public IK_Solver, public COM_Generation, public hardware_inte
         Mass_Info Left;
         Mass_Info Right;
         element base;
-        double trunk_offset;
+
         std::vector<double> Q;
         bool Verify();
         void Solve_Standing_Pose();
 
     protected:
+        double trunk_offset;
         ros::Publisher jointPub;
         tf::TransformBroadcaster br;
         sensor_msgs::JointState jointStateMsg;

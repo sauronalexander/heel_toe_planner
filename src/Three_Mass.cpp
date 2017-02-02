@@ -180,7 +180,7 @@ void Three_Mass::Generate_Reference_Angles(bool visualize)
         if(i%(NSample/10) == 0)
             ROS_INFO_STREAM(10*i/(NSample/10)<<" percent completed!");
         if(visualize)
-            ros::Duration(0.1).sleep();
+            ros::Duration(10.0*this->Period).sleep();
 
     }
 
@@ -216,7 +216,7 @@ void Three_Mass::read()
     ROS_INFO_STREAM("Fetching of Reference Angles Completed...");
 
 
-    ROS_INFO_STREAM("Begin Fetching Of Reference ZMP Trajectories...");
+    ROS_INFO_STREAM("Begin Fetching Reference ZMP Trajectories...");
     temp_path = path + "/database/ZMP_Trajectories.bin";
     ROS_INFO_STREAM("From File: "<<temp_path);
     std::ifstream ifs2(temp_path.c_str());
@@ -243,6 +243,107 @@ void Three_Mass::read()
         ia2 >> this->zmp_y->data[i];
     ifs2.close();
     ROS_INFO_STREAM("Fecthing of Reference ZMP Trajectories Completed...");
+
+    ROS_INFO_STREAM("Begin Fetching Reference COM Trajectories...");
+    temp_path = path + "/database/Left_Leg.bin";
+    ROS_INFO_STREAM("From File: "<<temp_path);
+    std::ifstream ifs3(temp_path.c_str());
+    boost::archive::binary_iarchive ia3(ifs3);
+
+    ia3 >> size;
+    emxInit_real_T(&this->x_left, 2);
+    size_array = this->x_left->size[0] * this->x_left->size[1];
+    this->x_left->size[0] = 1;
+    this->x_left->size[1] = size;
+    emxEnsureCapacity((emxArray__common *) x_left, size_array, (int)sizeof(double));
+    for(int i=0; i<this->x_left->size[1]; i++)
+        ia3 >> this->x_left->data[i];
+
+    ia3 >> size;
+    emxInit_real_T(&this->z_left, 2);
+    size_array = this->z_left->size[0] * this->z_left->size[1];
+    this->z_left->size[0] = 1;
+    this->z_left->size[1] = size;
+    emxEnsureCapacity((emxArray__common *) z_left, size_array, (int)sizeof(double));
+    for(int i=0; i<this->z_left->size[1]; i++)
+        ia3 >> this->z_left->data[i];
+    ifs3.close();
+
+    temp_path = path + "/database/Trunk.bin";
+    ROS_INFO_STREAM("From File: "<<temp_path);
+    std::ifstream ifs4(temp_path.c_str());
+    boost::archive::binary_iarchive ia4(ifs4);
+
+    ia4 >> size;
+    emxInit_real_T(&this->x_trunk, 2);
+    size_array = this->x_trunk->size[0] * this->x_trunk->size[1];
+    this->x_trunk->size[0] = 1;
+    this->x_trunk->size[1] = size;
+    emxEnsureCapacity((emxArray__common *) x_trunk, size_array, (int)sizeof(double));
+    for(int i=0; i<this->x_trunk->size[1]; i++)
+        ia4 >> this->x_trunk->data[i];
+
+    ia4 >> size;
+    emxInit_real_T(&this->y_trunk, 2);
+    size_array = this->y_trunk->size[0] * this->y_trunk->size[1];
+    this->y_trunk->size[0] = 1;
+    this->y_trunk->size[1] = size;
+    emxEnsureCapacity((emxArray__common *) y_trunk, size_array, (int)sizeof(double));
+    for(int i=0; i<this->y_trunk->size[1]; i++)
+        ia4 >> this->y_trunk->data[i];
+    ifs4.close();
+
+    temp_path = path + "/database/Right_Leg.bin";
+    ROS_INFO_STREAM("From File: "<<temp_path);
+    std::ifstream ifs5(temp_path.c_str());
+    boost::archive::binary_iarchive ia5(ifs5);
+
+    ia5 >> size;
+    emxInit_real_T(&this->x_right, 2);
+    size_array = this->x_right->size[0] * this->x_right->size[1];
+    this->x_right->size[0] = 1;
+    this->x_right->size[1] = size;
+    emxEnsureCapacity((emxArray__common *) x_right, size_array, (int)sizeof(double));
+    for(int i=0; i<this->x_right->size[1]; i++)
+        ia5 >> this->x_right->data[i];
+
+    ia5 >> size;
+    emxInit_real_T(&this->z_right, 2);
+    size_array = this->z_right->size[0] * this->z_right->size[1];
+    this->z_right->size[0] = 1;
+    this->z_right->size[1] = size;
+    emxEnsureCapacity((emxArray__common *) z_right, size_array, (int)sizeof(double));
+    for(int i=0; i<this->z_right->size[1]; i++)
+        ia5 >> this->z_right->data[i];
+    ifs5.close();
+
+    ROS_INFO_STREAM("Fecthing of Reference COM Trajectories Completed...");
+
+    ROS_INFO_STREAM("Begin Fetching Reference Foot Ground Trajectories...");
+    temp_path = path + "/database/Foot_Ground.bin";
+    ROS_INFO_STREAM("From File: "<<temp_path);
+    std::ifstream ifs6(temp_path.c_str());
+    boost::archive::binary_iarchive ia6(ifs6);
+
+    ia6 >> size;
+    emxInit_real_T(&this->theta_left, 2);
+    size_array = this->theta_left->size[0] * this->theta_left->size[1];
+    this->theta_left->size[0] = 1;
+    this->theta_left->size[1] = size;
+    emxEnsureCapacity((emxArray__common *) theta_left, size_array, (int)sizeof(double));
+    for(int i=0; i<this->theta_left->size[1]; i++)
+        ia6 >> this->theta_left->data[i];
+
+    ia6 >> size;
+    emxInit_real_T(&this->theta_right, 2);
+    size_array = this->theta_right->size[0] * this->theta_right->size[1];
+    this->theta_right->size[0] = 1;
+    this->theta_right->size[1] = size;
+    emxEnsureCapacity((emxArray__common *) theta_right, size_array, (int)sizeof(double));
+    for(int i=0; i<this->theta_right->size[1]; i++)
+        ia6 >> this->theta_right->data[i];
+    ifs6.close();
+    ROS_INFO_STREAM("Fecthing of Reference Foot Ground Trajectories Completed...");
 }
 
 void Three_Mass::write()
@@ -281,6 +382,61 @@ void Three_Mass::write()
         oa2 << this->zmp_y->data[i];
     ofs2.close();
     ROS_INFO_STREAM("Serialization of Reference ZMP Trajectories Completed...");
+
+    ROS_INFO_STREAM("Begin Serialization of Reference COM Trajectories...");
+    temp_path = path+ "/database/Left_Leg.bin";
+    ROS_INFO_STREAM("Left Leg: Saving To File: "<<temp_path);
+    std::ofstream ofs3(temp_path.c_str());
+    boost::archive::binary_oarchive oa3(ofs3);
+    oa3 << this->x_left->size[1];
+    for(int i=0; i<this->x_left->size[1]; i++)
+        oa3 << this->x_left->data[i];
+    oa3 << this->z_left->size[1];
+    for(int i=0; i<this->z_left->size[1]; i++)
+        oa3 << this->z_left->data[i];
+    ofs3.close();
+    ROS_INFO("Left Leg Completed...");
+
+    temp_path = path+ "/database/Trunk.bin";
+    ROS_INFO_STREAM("Trunk: Saving To File: "<<temp_path);
+    std::ofstream ofs4(temp_path.c_str());
+    boost::archive::binary_oarchive oa4(ofs4);
+    oa4 << this->x_trunk->size[1];
+    for(int i=0; i<this->x_trunk->size[1]; i++)
+        oa4 << this->x_trunk->data[i];
+    oa4 << this->y_trunk->size[1];
+    for(int i=0; i<this->y_trunk->size[1]; i++)
+        oa4 << this->y_trunk->data[i];
+    ofs4.close();
+    ROS_INFO("Trunk Completed...");
+
+    temp_path = path+ "/database/Right_Leg.bin";
+    ROS_INFO_STREAM("Right Leg: Saving To File: "<<temp_path);
+    std::ofstream ofs5(temp_path.c_str());
+    boost::archive::binary_oarchive oa5(ofs5);
+    oa5 << this->x_right->size[1];
+    for(int i=0; i<this->x_right->size[1]; i++)
+        oa5 << this->x_right->data[i];
+    oa5 << this->z_right->size[1];
+    for(int i=0; i<this->z_right->size[1]; i++)
+        oa5 << this->z_right->data[i];
+    ofs5.close();
+    ROS_INFO("Right Leg Completed...");
+    ROS_INFO_STREAM("Serialization of Reference COM Trajectories Completed...");
+
+    ROS_INFO_STREAM("Begin Serialization Of Reference Foot Ground Trajectories...");
+    temp_path = path + "/database/Foot_Ground.bin";
+    ROS_INFO_STREAM("Saving To File: "<<temp_path);
+    std::ofstream ofs6(temp_path.c_str());
+    boost::archive::binary_oarchive oa6(ofs6);
+    oa6 << this->theta_left->size[1];
+    for(int i=0; i<this->theta_left->size[1]; i++)
+        oa6 << this->theta_left->data[i];
+    oa6 << this->theta_right->size[1];
+    for(int i=0; i<this->theta_right->size[1]; i++)
+        oa6 << this->theta_right->data[i];
+    ofs6.close();
+    ROS_INFO_STREAM("Serialization of Reference Foot Ground Trajectories Completed...");
 
     if(Verify())
         ROS_INFO_STREAM("Serialization Complete");
@@ -350,7 +506,7 @@ bool Three_Mass::Verify()
     size_array = zmp_x_prime->size[0] * zmp_x_prime->size[1];
     zmp_x_prime->size[0] = 1;
     zmp_x_prime->size[1] = size;
-    if(zmp_x->size[1] != size)
+    if(this->zmp_x->size[1] != size)
         flag = false;
     emxEnsureCapacity((emxArray__common *) zmp_x_prime, size_array, (int)sizeof(double));
     for(int i=0; i<zmp_x_prime->size[1]; i++)
@@ -365,6 +521,8 @@ bool Three_Mass::Verify()
     size_array = zmp_y_prime->size[0] * zmp_y_prime->size[1];
     zmp_y_prime->size[0] = 1;
     zmp_y_prime->size[1] = size;
+    if(this->zmp_y->size[1] != size)
+        flag = false;
     emxEnsureCapacity((emxArray__common *) zmp_y_prime, size_array, (int)sizeof(double));
     for(int i=0; i<zmp_y_prime->size[1]; i++)
     {
@@ -372,13 +530,207 @@ bool Three_Mass::Verify()
         if(zmp_y_prime->data[i] != this->zmp_y->data[i])
             flag = false;
     }
+    ifs2.close();
     ROS_INFO_STREAM("Fecthing of Reference ZMP Trajectories Completed...");
+
+    ROS_INFO_STREAM("Begin Fetching Of Reference COM Trajectories...");
+    temp_path = path + "/database/Left_Leg.bin";
+    ROS_INFO_STREAM("From File: "<<temp_path);
+    std::ifstream ifs3(temp_path.c_str());
+    boost::archive::binary_iarchive ia3(ifs3);
+
+    emxArray_real_T* x_left_prime;
+    emxArray_real_T* z_left_prime;
+    x_left_prime = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
+    z_left_prime = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
+    Initial_emxArry(x_left_prime);
+    Initial_emxArry(z_left_prime);
+
+    ia3 >> size;
+    emxInit_real_T(&x_left_prime, 2);
+    size_array = x_left_prime->size[0] * x_left_prime->size[1];
+    x_left_prime->size[0] = 1;
+    x_left_prime->size[1] = size;
+    if(this->x_left->size[1] != size)
+        flag = false;
+    emxEnsureCapacity((emxArray__common *) x_left_prime, size_array, (int)sizeof(double));
+    for(int i=0; i<x_left_prime->size[1]; i++)
+    {
+        ia3 >> x_left_prime->data[i];
+        if(x_left_prime->data[i] != this->x_left->data[i])
+            flag = false;
+    }
+
+    ia3 >> size;
+    emxInit_real_T(&z_left_prime, 2);
+    size_array = z_left_prime->size[0] * z_left_prime->size[1];
+    z_left_prime->size[0] = 1;
+    z_left_prime->size[1] = size;
+    if(this->z_left->size[1] != size)
+        flag = false;
+    emxEnsureCapacity((emxArray__common *) z_left_prime, size_array, (int)sizeof(double));
+    for(int i=0; i<z_left_prime->size[1]; i++)
+    {
+        ia3 >> z_left_prime->data[i];
+        if(z_left_prime->data[i] != this->z_left->data[i])
+            flag = false;
+    }
+    ifs3.close();
+
+    temp_path = path + "/database/Trunk.bin";
+    ROS_INFO_STREAM("From File: "<<temp_path);
+    std::ifstream ifs4(temp_path.c_str());
+    boost::archive::binary_iarchive ia4(ifs4);
+
+    emxArray_real_T* x_trunk_prime;
+    emxArray_real_T* y_trunk_prime;
+    x_trunk_prime = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
+    y_trunk_prime = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
+    Initial_emxArry(x_trunk_prime);
+    Initial_emxArry(y_trunk_prime);
+
+    ia4 >> size;
+    emxInit_real_T(&x_trunk_prime, 2);
+    size_array = x_trunk_prime->size[0] * x_trunk_prime->size[1];
+    x_trunk_prime->size[0] = 1;
+    x_trunk_prime->size[1] = size;
+    if(this->x_trunk->size[1] != size)
+        flag = false;
+    emxEnsureCapacity((emxArray__common *) x_trunk_prime, size_array, (int)sizeof(double));
+    for(int i=0; i<x_trunk_prime->size[1]; i++)
+    {
+        ia4 >> x_trunk_prime->data[i];
+        if(x_trunk_prime->data[i] != this->x_trunk->data[i])
+            flag = false;
+    }
+
+    ia4 >> size;
+    emxInit_real_T(&y_trunk_prime, 2);
+    size_array = y_trunk_prime->size[0] * y_trunk_prime->size[1];
+    y_trunk_prime->size[0] = 1;
+    y_trunk_prime->size[1] = size;
+    if(this->y_trunk->size[1] != size)
+        flag = false;
+    emxEnsureCapacity((emxArray__common *) y_trunk_prime, size_array, (int)sizeof(double));
+    for(int i=0; i<y_trunk_prime->size[1]; i++)
+    {
+        ia4 >> y_trunk_prime->data[i];
+        if(y_trunk_prime->data[i] != this->y_trunk->data[i])
+            flag = false;
+    }
+    ifs4.close();
+
+    temp_path = path + "/database/Right_Leg.bin";
+    ROS_INFO_STREAM("From File: "<<temp_path);
+    std::ifstream ifs5(temp_path.c_str());
+    boost::archive::binary_iarchive ia5(ifs5);
+
+    emxArray_real_T* x_right_prime;
+    emxArray_real_T* z_right_prime;
+    x_right_prime = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
+    z_right_prime = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
+    Initial_emxArry(x_right_prime);
+    Initial_emxArry(z_right_prime);
+
+    ia5 >> size;
+    emxInit_real_T(&x_right_prime, 2);
+    size_array = x_right_prime->size[0] * x_right_prime->size[1];
+    x_right_prime->size[0] = 1;
+    x_right_prime->size[1] = size;
+    if(this->x_right->size[1] != size)
+        flag = false;
+    emxEnsureCapacity((emxArray__common *) x_right_prime, size_array, (int)sizeof(double));
+    for(int i=0; i<x_right_prime->size[1]; i++)
+    {
+        ia5 >> x_right_prime->data[i];
+        if(x_right_prime->data[i] != this->x_right->data[i])
+            flag = false;
+    }
+
+    ia5 >> size;
+    emxInit_real_T(&z_right_prime, 2);
+    size_array = z_right_prime->size[0] * z_right_prime->size[1];
+    z_right_prime->size[0] = 1;
+    z_right_prime->size[1] = size;
+    if(this->z_right->size[1] != size)
+        flag = false;
+    emxEnsureCapacity((emxArray__common *) z_right_prime, size_array, (int)sizeof(double));
+    for(int i=0; i<z_right_prime->size[1]; i++)
+    {
+        ia5 >> z_right_prime->data[i];
+        if(z_right_prime->data[i] != this->z_right->data[i])
+            flag = false;
+    }
+    ifs5.close();
+    ROS_INFO_STREAM("Fecthing of Reference COM Trajectories Completed...");
+
+    ROS_INFO_STREAM("Begin Fetching Of Reference Foot Ground Trajectories...");
+    temp_path = path + "/database/Foot_Ground.bin";
+    ROS_INFO_STREAM("From File: "<<temp_path);
+    std::ifstream ifs6(temp_path.c_str());
+    boost::archive::binary_iarchive ia6(ifs6);
+
+    emxArray_real_T* theta_left_prime;
+    emxArray_real_T* theta_right_prime;
+    theta_left_prime = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
+    theta_right_prime = (emxArray_real_T*) malloc(sizeof(emxArray_real_T));
+    Initial_emxArry(theta_left_prime);
+    Initial_emxArry(theta_right_prime);
+
+    ia6 >> size;
+    emxInit_real_T(&theta_left_prime, 2);
+    size_array = theta_left_prime->size[0] * theta_left_prime->size[1];
+    theta_left_prime->size[0] = 1;
+    theta_left_prime->size[1] = size;
+    if(this->theta_left->size[1] != size)
+        flag = false;
+    emxEnsureCapacity((emxArray__common *) theta_left_prime, size_array, (int)sizeof(double));
+    for(int i=0; i<theta_left_prime->size[1]; i++)
+    {
+        ia6 >> theta_left_prime->data[i];
+        if(theta_left_prime->data[i] != this->theta_left->data[i])
+            flag = false;
+    }
+
+    ia6 >> size;
+    emxInit_real_T(&theta_right_prime, 2);
+    size_array = theta_right_prime->size[0] * theta_right_prime->size[1];
+    theta_right_prime->size[0] = 1;
+    theta_right_prime->size[1] = size;
+    if(this->theta_right->size[1] != size)
+        flag = false;
+    emxEnsureCapacity((emxArray__common *) theta_right_prime, size_array, (int)sizeof(double));
+    for(int i=0; i<theta_right_prime->size[1]; i++)
+    {
+        ia6 >> theta_right_prime->data[i];
+        if(theta_right_prime->data[i] != this->theta_right->data[i])
+            flag = false;
+    }
+    ifs6.close();
+    ROS_INFO_STREAM("Fecthing of Reference Foot Ground Trajectories Completed...");
 
     Delete_emxArry(zmp_x_prime);
     Delete_emxArry(zmp_y_prime);
+    Delete_emxArry(x_left_prime);
+    Delete_emxArry(z_left_prime);
+    Delete_emxArry(x_trunk_prime);
+    Delete_emxArry(y_trunk_prime);
+    Delete_emxArry(x_right_prime);
+    Delete_emxArry(z_right_prime);
+    Delete_emxArry(theta_left_prime);
+    Delete_emxArry(theta_right_prime);
     zmp_x_prime = NULL;
     zmp_y_prime = NULL;
-    ifs2.close();
+    x_left_prime = NULL;
+    z_left_prime = NULL;
+    x_trunk_prime = NULL;
+    y_trunk_prime = NULL;
+    x_right_prime = NULL;
+    z_right_prime = NULL;
+    theta_left_prime = NULL;
+    theta_right_prime = NULL;
+
+
     return flag;
 }
 

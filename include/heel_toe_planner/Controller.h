@@ -17,9 +17,13 @@ class Reemc_Trajectory_Control: public Three_Mass
        TrajClient* traj_client_;
        ros::Publisher pub_left_leg;
        ros::Publisher pub_right_leg;
+       std::vector<std::vector<double>> ModifiedJointAngles;
        control_msgs::FollowJointTrajectoryActionGoal ExtendTrajectory(int step, int leg);
        control_msgs::FollowJointTrajectoryActionGoal DefaultPose(int leg);
        void Debug();
+       void Manual(size_t start,size_t end);
+       size_t start;
+       size_t end;
 
    protected:
        ros::NodeHandle nh;

@@ -63,7 +63,7 @@ class COM_Generation
         double ratio;
 
         double wfoot;
-        double Period;
+
         double htar;
         double lstep;
         double lfoot;
@@ -101,6 +101,7 @@ class COM_Generation
         double * theta_i;
         double * theta_e;
         double w;
+        double Period;
 
 	public:
 
